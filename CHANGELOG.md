@@ -1,3 +1,8 @@
+## v1.0.1
+
+### Fix
+- fix: config 方法所有配置都是可选项 [c585715](https://github.com/x-dirve/request/commit/c585715c6e50d15933f11b1a37bcfd8364a807a6)
+
 ## v1.0.0
 
 ### Feat
