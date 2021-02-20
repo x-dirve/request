@@ -1,0 +1,446 @@
+import {
+    each,
+    merge,
+    isString,
+    isObject,
+    isUndefined,
+    queryString,
+    labelReplace,
+    labelReplaceExp
+} from "@x-drive/utils";
+
+/**自动提示用的浮层 */
+var notification:any;
+
+type ApiSubject = { 
+    [key: string]: string;
+ }
+
+/**所有 api 存储对象 */
+const APIS: ApiSubject = {};
+
+type HostSubject = {
+    [name: string]: string;
+}
+
+/**所有域名存储对象 */
+const HOSTS: HostSubject = {};
+
+/**请求成功状态码 */
+var CODE_SUCCESS: number | string = 1;
+
+/**请求方法判断正则 */
+const REQ_METHOD_REQ_EXP: RegExp = /get|head|delete/;
+
+/**
+ * 网络协议检测正则
+ */
+const PROTOCOL_REG_EXP: RegExp = /^http[s]?:/i;
+
+/**接口名称声明判断 */
+const API_REQ_PATH_REG_EXP: RegExp = /^\//i;
+
+/**
+ * 请求配置
+ */
+interface ReqConf {
+    /**是否自动提示接口返回的信息 */
+    autoToast?: boolean;
+
+    /**请求数据类型 */
+    dataType?: string;
+
+    /**是否添加随机数 */
+    fresh?: boolean;
+
+    /**是否携带 cookie */
+    credentials?: boolean;
+
+    /**请求头设置 */
+    header?: object;
+
+    /**超时时间 */
+    timeout?: number;
+
+    /**是否返回原始数据 */
+    raw?: boolean;
+}
+
+/**
+ * 请求参数 (query)
+ */
+interface ReqParams {
+    [propName: string]: any;
+}
+
+/**
+ * 请求数据 (post)
+ */
+interface ReqData {
+    [propName: string]: any;
+}
+
+/**
+ * 请求 promise 对象
+ */
+interface ReqPromise extends Promise<any> {
+    [propName: string]: any;
+}
+
+/**
+ * 各个页面包含的请求
+ */
+const RequestQueue: object = {};
+
+/**
+ * 加入到列表
+ * @param  {Object} key 当前的页面对象
+ * @param  {Object} val 请求对象
+ */
+const pushQueue = function (val: XMLHttpRequest) {
+    const pathname = window.location.pathname;
+    if (!RequestQueue[pathname]) {
+        RequestQueue[pathname] = [];
+    }
+    RequestQueue[pathname].push(val);
+}
+
+/**
+ * 从列表删除一个请求
+ * @param  {Object} key 当前页面对象
+ * @param  {Object} val 请求对象
+ */
+const spliceQueue = function (val: XMLHttpRequest) {
+    const pathname = window.location.pathname;
+    if (RequestQueue[pathname] && RequestQueue[pathname].length) {
+        const index = RequestQueue[pathname].indexOf(val);
+        if (index !== -1) {
+            RequestQueue[pathname].splice(index, 1);
+        }
+    }
+}
+
+/**
+ * 解析生成正确的数据请求地址
+ * @param  {String} url    接口别名或具体的请求地址
+ * @param  {Object} params 请求参数对象
+ * @return {String}
+ */
+export function resloveUrl(uri: string, params?: ReqParams): string {
+    var oUri = uri;
+    uri = APIS[uri];
+    uri = uri || oUri;
+    if (isObject(params)) {
+        uri = uri.replace(labelReplaceExp, function (_, key) {
+            const re = params[key];
+            delete params[key];
+            return re;
+        })
+    }
+    return uri;
+}
+
+class Request {
+    /**默认请求配置 */
+    private defConf: ReqConf = {
+        "autoToast": true
+        , "dataType": "json"
+        , "fresh": true
+        , "credentials": false
+        , "header": {
+            "X-Requested-With": "XMLHttpRequest"
+        }
+        , "timeout": 10000
+        , "raw": false
+    }
+
+    /**检测是否同域用的 a 标签 */
+    static A: any = document.createElement("a");
+
+    /**
+     * 注册一个请求 api 模块
+     * @static
+     * @param  subject  模块 api 设置
+     * @param  host     api 请求域名
+     */
+    static register(subject: ApiSubject, host?: string): void {
+        if (isObject(subject)) {
+            each(subject, (val, key) => {
+                if (APIS[key]) {
+                    console.warn(`API ${key} 已被定义`);
+                } else {
+                    if (!API_REQ_PATH_REG_EXP.test(key)) {
+                        key = `/${key}`;
+                    }
+                    if (isString(host) && !PROTOCOL_REG_EXP.test(val)) {
+                        if (!API_REQ_PATH_REG_EXP.test(val)) {
+                            val = `/${val}`;
+                        }
+                        val = `${host}${val}`;
+                    } else if (!PROTOCOL_REG_EXP.test(val)) {
+                        // 如果接口不以 http 或 https 开头的，则尝试替换里面的占位符
+                        // 这里只替换可能存在的 host，所以必须保留其他任何未能解析的花括号
+                        val = labelReplace(val, HOSTS, true);
+                    }
+                    APIS[key] = val;
+                }
+            })
+        }
+    }
+
+    /**
+     * 放弃当前正在发起的所有请求
+     */
+    static cancel() {
+        const pathname = window.location.pathname;
+        var nowReqs = RequestQueue[pathname];
+        if (nowReqs && nowReqs.length) {
+            try {
+                for (var name in nowReqs) {
+                    let req = nowReqs[name];
+                    if (req) {
+                        req.abort();
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        RequestQueue[pathname] = [];
+    }
+
+    /**
+     * 生成一个 16 进制的随机数
+     */
+    static randomStr(): string {
+        return (Date.now() + Math.random()).toString(16);
+    }
+
+    /**
+     * 解析生成正确的数据请求地址
+     * @param {String} url    接口别名或具体的请求地址
+     * @param {Object} params 请求参数对象
+     * @return {String}
+     */
+    resolveUri(uri: string, params: object) {
+        return resloveUrl(uri, params);
+    }
+
+    /**
+     * 处理 post 数据
+     * @param data post 数据
+     * @return 处理过后的数据
+     */
+    private parseData(data: string | object): string {
+        if (isString(data)) {
+            return (data as string).replace(/\+/g, "%2B");
+        }
+        return JSON.stringify(data);
+    }
+
+    /**
+     * 将对象转化为 form data
+     * @param data 要转化成 form data 的数据
+     * @return form data
+     */
+    private parseFormData(data: object): FormData {
+        const fd = new FormData();
+        if (isObject(data)) {
+            each(data, (val: any, key: string) => {
+                fd.append(key, val);
+            })
+        }
+        return fd;
+    }
+
+    /**
+     * 判断是否处于同一个域名下
+     * @param url 待判断的地址
+     */
+    private checkOriginHost(url: string): boolean {
+        Request.A.href = url;
+        return Request.A.host === window.location.host;
+    }
+
+    /**
+     * 执行请求
+     * @param   {String}  type    请求类型
+     * @param   {String}  url     请求url或别名
+     * @param   {Object}  param   请求参数
+     * @param   {Object}  data    请求数据
+     * @param   {ReqConf} config  请求配置
+     * @returns {Object}          请求 Promise 对象
+     */
+    run<T>(type: string, url: string, params: ReqParams = {}, data: ReqData = {}, config: ReqConf = {}): Promise<T> {
+        type = type.toLocaleLowerCase();
+
+        var reqConf: ReqConf = merge(
+            this.defConf
+            , config
+        )
+
+        if (reqConf.fresh) {
+            // 有强制刷新设置则自动追加随机数
+            params._ = Request.randomStr();
+        }
+
+        // 解析地址
+        url = this.resolveUri(url, params);
+        // 处理 query 参数
+        if (isObject(params)) {
+            url += `?${queryString(params)}`;
+        }
+
+        var xhr = new XMLHttpRequest();
+        var req: ReqPromise = new Promise((resolve: Function, reject: Function) => {
+            var reqData: string | FormData;
+            var header: object = reqConf.header;
+            const isCrossOrigin = !this.checkOriginHost(url);
+
+            if (!REQ_METHOD_REQ_EXP.test(type)) {
+                if (!header.hasOwnProperty("Content-Type")) {
+                    header["Content-Type"] = "application/json";
+                }
+                if (header["Content-Type"] === null) {
+                    // formdata
+                    delete header["Content-Type"];
+                    reqData = this.parseFormData(data);
+                } else {
+                    // 默认json
+                    reqData = this.parseData(data);
+                }
+            }
+
+            if (isCrossOrigin) {
+                if (config.credentials) {
+                    xhr.withCredentials = true;
+                }
+                delete header["X-Requested-With"];
+            }
+
+            each(header, (val, key) => {
+                xhr.setRequestHeader(key, val);
+            });
+
+            if (config.timeout) {
+                xhr.timeout = config.timeout;
+            }
+
+            xhr.open(type, url, true);
+
+            xhr.onload = function () {
+                spliceQueue(this);
+                if (this.status >= 200 && this.status < 300 || this.status === 304) {
+                    var re: any = this.responseText;
+                    if (reqConf.dataType === "json") {
+                        try {
+                            re = JSON.parse(re);
+                        } catch (err) {
+                            reject(err);
+                            return;
+                        }
+                    }
+
+                    const { data, code } = re;
+                    if (Number(code) !== CODE_SUCCESS) {
+                        const message: string = data.message || data.msg;
+                        if (reqConf.autoToast && message && notification) {
+                            notification.error({
+                                "description": message
+                                , "message": "请求错误"
+                            })
+                        }
+                        return reject(re);
+                    }
+
+                    resolve(
+                        config.raw ? data : re.data || {}
+                    );
+                } else {
+                    reject(new Error(`Request Error, status [${this.status}]`));
+                }
+            }
+
+            xhr.ontimeout = xhr.onerror = function (e) {
+                spliceQueue(this);
+                reject(e);
+            }
+
+            xhr.send(reqData);
+        })
+
+        req.abort = function () {
+            xhr.abort();
+            spliceQueue(xhr);
+        }
+        pushQueue(xhr);
+        return req;
+    }
+
+    /**
+     * 发起一个 get 请求
+     * @param   {String}   url     请求url或别名
+     * @param   {Object}   param   请求参数
+     * @param   {ReqConf}  config  请求配置
+     * @returns {Object}
+     */
+    get(url: string, param?: ReqParams, config?: ReqConf) {
+        return this.run("GET", url, param, {}, config);
+    }
+
+    /**
+     * 发起一个 post 请求
+     * @param   {String}  url      请求url或别名
+     * @param   {Object}  param    请求参数
+     * @param   {Object}  data     请求数据
+     * @param   {ReqConf} config  请求配置
+     * @returns {Object}
+     */
+    post(url: string, param?: ReqParams, data?: ReqData, config?: ReqConf) {
+        if (isObject(param) && isUndefined(data)) {
+            data = param;
+            param = {};
+        }
+        if (isUndefined(data)) {
+            data = {};
+        }
+        return this.run("POST", url, param, data, config);
+    }
+}
+
+export { Request as R };
+
+type ConfigOption = {
+    /**请求成功时的状态码 */
+    successCode: number|string;
+
+    /**域名配置 */
+    hosts: HostSubject;
+
+    /**api 别名 */
+    apis:ApiSubject;
+}
+
+/**
+ * 设置请求模块
+ * @param config 模块配置
+ */
+function config(config: ConfigOption) {
+    const { successCode, hosts, apis } = config;
+    if (!isUndefined(successCode)) {
+        CODE_SUCCESS = successCode;
+    }
+
+    if (isObject(hosts)) {
+        each(hosts, function (val, key) {
+            HOSTS[key] = val;
+        });
+    }
+
+    if (isObject(apis)) {
+        Request.register(apis)
+    }
+}
+export { config }
+
+export default new Request();
