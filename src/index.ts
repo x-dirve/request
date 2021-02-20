@@ -419,6 +419,9 @@ type ConfigOption = {
 
     /**api 别名 */
     apis:ApiSubject;
+
+    /**提示浮层 */
+    notifyMod:any;
 }
 
 /**
@@ -426,7 +429,7 @@ type ConfigOption = {
  * @param config 模块配置
  */
 function config(config: ConfigOption) {
-    const { successCode, hosts, apis } = config;
+    const { successCode, hosts, apis, notifyMod } = config;
     if (!isUndefined(successCode)) {
         CODE_SUCCESS = successCode;
     }
@@ -439,6 +442,10 @@ function config(config: ConfigOption) {
 
     if (isObject(apis)) {
         Request.register(apis)
+    }
+
+    if (!isUndefined(notifyMod)) {
+        notification = notifyMod;
     }
 }
 export { config }
