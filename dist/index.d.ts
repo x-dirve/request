@@ -117,13 +117,13 @@ declare class Request {
 export { Request as R };
 declare type ConfigOption = {
     /**请求成功时的状态码 */
-    successCode: number | string;
+    successCode?: number | string;
     /**域名配置 */
-    hosts: HostSubject;
+    hosts?: HostSubject;
     /**api 别名 */
-    apis: ApiSubject;
+    apis?: ApiSubject;
     /**提示浮层 */
-    notifyMod: any;
+    notifyMod?: any;
 };
 /**
  * 设置请求模块
