@@ -381,15 +381,15 @@ class Request {
                 delete header["X-Requested-With"];
             }
 
-            each(header, (val, key) => {
-                xhr.setRequestHeader(key, val);
-            });
-
             if (config.timeout) {
                 xhr.timeout = config.timeout;
             }
 
             xhr.open(type, url, true);
+
+            each(header, (val, key) => {
+                xhr.setRequestHeader(key, val);
+            });
 
             const me = this;
             xhr.onload = function () {
