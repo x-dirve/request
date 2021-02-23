@@ -31,6 +31,20 @@ type ErrorMsg = {
     message:string;
 }
 
+/**请求钩子 */
+type ReqHooks = {
+    /**请求前钩子 */
+    onRequest?: (config: ReqConf, params: ReqParams, data: ReqData) => void;
+    /**请求后钩子 */
+    onResponse?: (raw:string) => any;
+}
+
+/**请求实例设置 */
+type ReqSetting = {
+    /**请求钩子 */
+    hooks?: ReqHooks
+}
+
 /**所有 api 存储对象 */
 const APIS: ApiSubject = {};
 
@@ -169,6 +183,22 @@ class Request {
         , "raw": false
     }
 
+    /**请求钩子 */
+    hooks: ReqHooks = {};
+
+    constructor() {
+        // @ts-ignore
+        var onRequest = (config: ReqConf, params: ReqParams, data: ReqData) => { };
+        var onResponse = (raw: string) => {
+            return raw;
+        }
+        // 默认 hook
+        this.hooks = {
+            onRequest
+            , onResponse
+        }
+    }
+
     /**检测是否同域用的 a 标签 */
     static A: any = document.createElement("a");
 
@@ -278,6 +308,19 @@ class Request {
     }
 
     /**
+     * 配置实例中的某些设置
+     * @param setting 实例配置对象
+     */
+    setting(setting?:ReqSetting) {
+        if (!isObject(setting)) {
+            return;
+        }
+        if (isObject(setting.hooks)) {
+            this.hooks = merge(this.hooks, setting.hooks);
+        }
+    }
+
+    /**
      * 执行请求
      * @param   {String}  type    请求类型
      * @param   {String}  url     请求url或别名
@@ -297,6 +340,11 @@ class Request {
         if (reqConf.fresh) {
             // 有强制刷新设置则自动追加随机数
             params._ = Request.randomStr();
+        }
+
+        // 请求钩子
+        if (isFunction(this.hooks.onRequest)) {
+            this.hooks.onRequest.call(this, params, data);
         }
 
         // 解析地址
@@ -343,10 +391,16 @@ class Request {
 
             xhr.open(type, url, true);
 
+            const me = this;
             xhr.onload = function () {
                 spliceQueue(this);
                 if (this.status >= 200 && this.status < 300 || this.status === 304) {
                     var re: any = this.responseText;
+                    // 返回钩子
+                    if (isFunction(me.hooks.onResponse)) {
+                        me.hooks.onResponse.call(me, re);
+                    }
+
                     if (reqConf.dataType === "json") {
                         try {
                             re = JSON.parse(re);
