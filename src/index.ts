@@ -6,15 +6,30 @@ import {
     isUndefined,
     queryString,
     labelReplace,
-    labelReplaceExp
+    labelReplaceExp,
+    isFunction
 } from "@x-drive/utils";
 
 /**自动提示用的浮层 */
 var notification:any;
 
+/**出错信息提示格式化函数 */
+var notificationMsgFormater = function(msg) {
+    return msg;
+}
+
 type ApiSubject = { 
     [key: string]: string;
- }
+}
+
+/**接口错误时的提示信息 */ 
+type ErrorMsg = {
+    /**错误详情 */
+    description:string;
+
+    /**错误信息 */
+    message:string;
+}
 
 /**所有 api 存储对象 */
 const APIS: ApiSubject = {};
@@ -345,10 +360,12 @@ class Request {
                     if (Number(code) !== CODE_SUCCESS) {
                         const message: string = data.message || data.msg;
                         if (reqConf.autoToast && message && notification) {
-                            notification.error({
-                                "description": message
-                                , "message": "请求错误"
-                            })
+                            notification.error(
+                                notificationMsgFormater({
+                                    "description": message
+                                    , "message": "请求错误"
+                                })
+                            );
                         }
                         return reject(re);
                     }
@@ -422,6 +439,9 @@ type ConfigOption = {
 
     /**提示浮层 */
     notifyMod?:any;
+
+    /**提示信息格式化函数 */
+    notifyMsgFormater?: (msg: ErrorMsg) => any;
 }
 
 /**
@@ -429,7 +449,7 @@ type ConfigOption = {
  * @param config 模块配置
  */
 function config(config: ConfigOption) {
-    const { successCode, hosts, apis, notifyMod } = config;
+    const { successCode, hosts, apis, notifyMod, notifyMsgFormater } = config;
     if (!isUndefined(successCode)) {
         CODE_SUCCESS = successCode;
     }
@@ -446,6 +466,10 @@ function config(config: ConfigOption) {
 
     if (!isUndefined(notifyMod)) {
         notification = notifyMod;
+    }
+
+    if (isFunction(notifyMsgFormater)) {
+        notificationMsgFormater = notifyMsgFormater;
     }
 }
 export { config }
