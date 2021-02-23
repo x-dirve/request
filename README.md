@@ -3,31 +3,47 @@
 > 简易的支持自动域名替换、接口别名的请求模块
 
 ## 模块设置
-如果希望使用别名、自动域名替换、修改请求成功状态码、失败自动提示功能，需要在业务模块调用前使用模块 `config` 方法对模块进行设置。
-```ts
-config(config: ConfigOption): void;
-```
-`config` 对象支持配置参数：
-- `successCode` 请求成功时的状态码
-- `hosts` 域名配置
-- `apis` api 别名
-- `notifyMod` 提示浮层
+- 如果希望使用别名、自动域名替换、修改请求成功状态码、失败自动提示功能，需要在业务模块调用前使用模块 `config` 方法对模块进行设置。
+    ```ts
+    config(config: ConfigOption): void;
+    ```
+    `config` 对象支持配置参数：
+    - `successCode` 请求成功时的状态码
+    - `hosts` 域名配置
+    - `apis` api 别名
+    - `notifyMod` 提示浮层
 
-```javascript
-import { config } from "@x-drive/request";
-config({
-    // 将请求成功状态码修改为 233
-	"successCode": "233"
-    // 指定了 product 业务的地址
-	, "hosts": {
-		"product": "http://api.test.dev"
-	}
-    // 设置了 /home 业务的别名
-	, "apis": {
-		"/home": "/api/hahaha/home"
-	}
-});
-```
+    ```javascript
+    import { config } from "@x-drive/request";
+    config({
+        // 将请求成功状态码修改为 233
+        "successCode": "233"
+        // 指定了 product 业务的地址
+        , "hosts": {
+            "product": "http://api.test.dev"
+        }
+        // 设置了 /home 业务的别名
+        , "apis": {
+            "/home": "/api/hahaha/home"
+        }
+    });
+    ```
+- 模块目前支持请求前及请求后钩子，该功能只支持实例级别的设置
+    ```ts
+    import Request from "@x-drive/request";
+    // 全局请求实例设置
+    Request.setting({
+        "hooks": {
+            onRequest(conf) {
+                console.log(conf);
+            }
+            , onResponse(raw) {
+                console.log(raw);
+                return raw;
+            }
+        }
+    });
+    ```
 
 ## 使用方式
 
