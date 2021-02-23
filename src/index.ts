@@ -13,22 +13,26 @@ import {
 /**自动提示用的浮层 */
 var notification:any;
 
+/**接口错误时的提示信息 */
+type ErrorMsg = {
+    /**错误详情 */
+    description: string;
+
+    /**错误信息 */
+    message: string;
+
+    /**提示类型 */
+    type: string;
+}
+
+
 /**出错信息提示格式化函数 */
-var notificationMsgFormater = function(msg) {
+var notificationMsgFormater = function (msg: ErrorMsg) {
     return msg;
 }
 
 type ApiSubject = { 
     [key: string]: string;
-}
-
-/**接口错误时的提示信息 */ 
-type ErrorMsg = {
-    /**错误详情 */
-    description:string;
-
-    /**错误信息 */
-    message:string;
 }
 
 /**请求钩子 */
@@ -167,6 +171,11 @@ export function resloveUrl(uri: string, params?: ReqParams): string {
         })
     }
     return uri;
+}
+
+/**日志 */
+function log(...msg) {
+    console.log.call(console, "%c[Request]", "color: cyan;", ...msg);
 }
 
 class Request {
@@ -315,6 +324,7 @@ class Request {
         if (!isObject(setting)) {
             return;
         }
+        log("setting","->", setting);
         if (isObject(setting.hooks)) {
             this.hooks = merge(this.hooks, setting.hooks);
         }
@@ -414,10 +424,11 @@ class Request {
                     if (Number(code) !== CODE_SUCCESS) {
                         const message: string = data.message || data.msg;
                         if (reqConf.autoToast && message && notification) {
-                            notification.error(
+                            notification(
                                 notificationMsgFormater({
                                     "description": message
                                     , "message": "请求错误"
+                                    , "type": "fail"
                                 })
                             );
                         }
@@ -504,6 +515,9 @@ type ConfigOption = {
  */
 function config(config: ConfigOption) {
     const { successCode, hosts, apis, notifyMod, notifyMsgFormater } = config;
+    
+    log("config", "->", config);
+
     if (!isUndefined(successCode)) {
         CODE_SUCCESS = successCode;
     }
