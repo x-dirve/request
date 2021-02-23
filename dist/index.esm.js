@@ -161,6 +161,10 @@ function queryString(dat) {
 
 /**自动提示用的浮层 */
 var notification;
+/**出错信息提示格式化函数 */
+var notificationMsgFormater = function (msg) {
+    return msg;
+};
 /**所有 api 存储对象 */
 const APIS = {};
 /**所有域名存储对象 */
@@ -237,6 +241,18 @@ class Request {
             },
             "timeout": 10000,
             "raw": false
+        };
+        /**请求钩子 */
+        this.hooks = {};
+        // @ts-ignore
+        var onRequest = (config, params, data) => { };
+        var onResponse = (raw) => {
+            return raw;
+        };
+        // 默认 hook
+        this.hooks = {
+            onRequest,
+            onResponse
         };
     }
     /**
@@ -341,6 +357,18 @@ class Request {
         return Request.A.host === window.location.host;
     }
     /**
+     * 配置实例中的某些设置
+     * @param setting 实例配置对象
+     */
+    setting(setting) {
+        if (!isObject(setting)) {
+            return;
+        }
+        if (isObject(setting.hooks)) {
+            this.hooks = merge(this.hooks, setting.hooks);
+        }
+    }
+    /**
      * 执行请求
      * @param   {String}  type    请求类型
      * @param   {String}  url     请求url或别名
@@ -355,6 +383,10 @@ class Request {
         if (reqConf.fresh) {
             // 有强制刷新设置则自动追加随机数
             params._ = Request.randomStr();
+        }
+        // 请求钩子
+        if (isFunction(this.hooks.onRequest)) {
+            this.hooks.onRequest.call(this, params, data);
         }
         // 解析地址
         url = this.resolveUri(url, params);
@@ -387,17 +419,22 @@ class Request {
                 }
                 delete header["X-Requested-With"];
             }
-            each(header, (val, key) => {
-                xhr.setRequestHeader(key, val);
-            });
             if (config.timeout) {
                 xhr.timeout = config.timeout;
             }
             xhr.open(type, url, true);
+            each(header, (val, key) => {
+                xhr.setRequestHeader(key, val);
+            });
+            const me = this;
             xhr.onload = function () {
                 spliceQueue(this);
                 if (this.status >= 200 && this.status < 300 || this.status === 304) {
                     var re = this.responseText;
+                    // 返回钩子
+                    if (isFunction(me.hooks.onResponse)) {
+                        me.hooks.onResponse.call(me, re);
+                    }
                     if (reqConf.dataType === "json") {
                         try {
                             re = JSON.parse(re);
@@ -411,10 +448,10 @@ class Request {
                     if (Number(code) !== CODE_SUCCESS) {
                         const message = data.message || data.msg;
                         if (reqConf.autoToast && message && notification) {
-                            notification.error({
+                            notification.error(notificationMsgFormater({
                                 "description": message,
                                 "message": "请求错误"
-                            });
+                            }));
                         }
                         return reject(re);
                     }
@@ -473,7 +510,7 @@ Request.A = document.createElement("a");
  * @param config 模块配置
  */
 function config(config) {
-    const { successCode, hosts, apis, notifyMod } = config;
+    const { successCode, hosts, apis, notifyMod, notifyMsgFormater } = config;
     if (!isUndefined(successCode)) {
         CODE_SUCCESS = successCode;
     }
@@ -487,6 +524,9 @@ function config(config) {
     }
     if (!isUndefined(notifyMod)) {
         notification = notifyMod;
+    }
+    if (isFunction(notifyMsgFormater)) {
+        notificationMsgFormater = notifyMsgFormater;
     }
 }
 var index = new Request();

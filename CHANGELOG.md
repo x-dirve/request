@@ -1,3 +1,12 @@
+## v1.0.2
+
+### Fix
+- fix: 修复请求打开前设置请求头报错的问题 [a4b3812](https://github.com/x-dirve/request/commit/a4b3812a0b58fe2bfa15c7dc8e87f74dd58acd30)
+
+### Feat
+- feat: 增加请求前及请求后钩子支持 [62edc13](https://github.com/x-dirve/request/commit/62edc1348d0baae61c7ef5b45dcd6867d75b2986)
+- feat: 增加错误提示信息数据格式化函数支持 [7ec63d2](https://github.com/x-dirve/request/commit/7ec63d221153a20d6c25e0a15d5a3e7d8e03c8da)
+
 ## v1.0.1
 
 ### Fix

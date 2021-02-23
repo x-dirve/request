@@ -1,6 +1,25 @@
 declare type ApiSubject = {
     [key: string]: string;
 };
+/**接口错误时的提示信息 */
+declare type ErrorMsg = {
+    /**错误详情 */
+    description: string;
+    /**错误信息 */
+    message: string;
+};
+/**请求钩子 */
+declare type ReqHooks = {
+    /**请求前钩子 */
+    onRequest?: (config: ReqConf, params: ReqParams, data: ReqData) => void;
+    /**请求后钩子 */
+    onResponse?: (raw: string) => any;
+};
+/**请求实例设置 */
+declare type ReqSetting = {
+    /**请求钩子 */
+    hooks?: ReqHooks;
+};
 declare type HostSubject = {
     [name: string]: string;
 };
@@ -45,6 +64,9 @@ export declare function resloveUrl(uri: string, params?: ReqParams): string;
 declare class Request {
     /**默认请求配置 */
     private defConf;
+    /**请求钩子 */
+    hooks: ReqHooks;
+    constructor();
     /**检测是否同域用的 a 标签 */
     static A: any;
     /**
@@ -87,6 +109,11 @@ declare class Request {
      */
     private checkOriginHost;
     /**
+     * 配置实例中的某些设置
+     * @param setting 实例配置对象
+     */
+    setting(setting?: ReqSetting): void;
+    /**
      * 执行请求
      * @param   {String}  type    请求类型
      * @param   {String}  url     请求url或别名
@@ -124,6 +151,8 @@ declare type ConfigOption = {
     apis?: ApiSubject;
     /**提示浮层 */
     notifyMod?: any;
+    /**提示信息格式化函数 */
+    notifyMsgFormater?: (msg: ErrorMsg) => any;
 };
 /**
  * 设置请求模块

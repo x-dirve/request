@@ -167,6 +167,10 @@ function queryString(dat) {
 
 /**自动提示用的浮层 */
 var notification;
+/**出错信息提示格式化函数 */
+var notificationMsgFormater = function (msg) {
+    return msg;
+};
 /**所有 api 存储对象 */
 var APIS = {};
 /**所有域名存储对象 */
@@ -242,6 +246,18 @@ var Request = function Request() {
         },
         "timeout": 10000,
         "raw": false
+    };
+    /**请求钩子 */
+    this.hooks = {};
+    // @ts-ignore
+    var onRequest = function (config, params, data) { };
+    var onResponse = function (raw) {
+        return raw;
+    };
+    // 默认 hook
+    this.hooks = {
+        onRequest: onRequest,
+        onResponse: onResponse
     };
 };
 /**
@@ -346,6 +362,18 @@ Request.prototype.checkOriginHost = function checkOriginHost (url) {
     return Request.A.host === window.location.host;
 };
 /**
+ * 配置实例中的某些设置
+ * @param setting 实例配置对象
+ */
+Request.prototype.setting = function setting (setting$1) {
+    if (!isObject(setting$1)) {
+        return;
+    }
+    if (isObject(setting$1.hooks)) {
+        this.hooks = merge(this.hooks, setting$1.hooks);
+    }
+};
+/**
  * 执行请求
  * @param   {String}  type请求类型
  * @param   {String}  url 请求url或别名
@@ -365,6 +393,10 @@ Request.prototype.run = function run (type, url, params, data, config) {
     if (reqConf.fresh) {
         // 有强制刷新设置则自动追加随机数
         params._ = Request.randomStr();
+    }
+    // 请求钩子
+    if (isFunction(this.hooks.onRequest)) {
+        this.hooks.onRequest.call(this, params, data);
     }
     // 解析地址
     url = this.resolveUri(url, params);
@@ -397,17 +429,22 @@ Request.prototype.run = function run (type, url, params, data, config) {
             }
             delete header["X-Requested-With"];
         }
-        each(header, function (val, key) {
-            xhr.setRequestHeader(key, val);
-        });
         if (config.timeout) {
             xhr.timeout = config.timeout;
         }
         xhr.open(type, url, true);
+        each(header, function (val, key) {
+            xhr.setRequestHeader(key, val);
+        });
+        var me = this$1;
         xhr.onload = function () {
             spliceQueue(this);
             if (this.status >= 200 && this.status < 300 || this.status === 304) {
                 var re = this.responseText;
+                // 返回钩子
+                if (isFunction(me.hooks.onResponse)) {
+                    me.hooks.onResponse.call(me, re);
+                }
                 if (reqConf.dataType === "json") {
                     try {
                         re = JSON.parse(re);
@@ -422,10 +459,10 @@ Request.prototype.run = function run (type, url, params, data, config) {
                 if (Number(code) !== CODE_SUCCESS) {
                     var message = data.message || data.msg;
                     if (reqConf.autoToast && message && notification) {
-                        notification.error({
+                        notification.error(notificationMsgFormater({
                             "description": message,
                             "message": "请求错误"
-                        });
+                        }));
                     }
                     return reject(re);
                 }
@@ -487,6 +524,7 @@ function config(config) {
     var hosts = config.hosts;
     var apis = config.apis;
     var notifyMod = config.notifyMod;
+    var notifyMsgFormater = config.notifyMsgFormater;
     if (!isUndefined(successCode)) {
         CODE_SUCCESS = successCode;
     }
@@ -500,6 +538,9 @@ function config(config) {
     }
     if (!isUndefined(notifyMod)) {
         notification = notifyMod;
+    }
+    if (isFunction(notifyMsgFormater)) {
+        notificationMsgFormater = notifyMsgFormater;
     }
 }
 var index = new Request();
