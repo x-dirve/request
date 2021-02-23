@@ -1,12 +1,14 @@
-declare type ApiSubject = {
-    [key: string]: string;
-};
 /**接口错误时的提示信息 */
 declare type ErrorMsg = {
     /**错误详情 */
     description: string;
     /**错误信息 */
     message: string;
+    /**提示类型 */
+    type: string;
+};
+declare type ApiSubject = {
+    [key: string]: string;
 };
 /**请求钩子 */
 declare type ReqHooks = {

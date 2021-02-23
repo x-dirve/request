@@ -1,3 +1,8 @@
+## v1.0.3
+
+### Feat
+- feat: 设置模块时输出设置信息，修改提示调用方式 [d2e5984](https://github.com/x-dirve/request/commit/d2e5984023b1a416003699622424217693d5af06)
+
 ## v1.0.2
 
 ### Fix

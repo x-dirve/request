@@ -228,6 +228,10 @@ function resloveUrl(uri, params) {
     }
     return uri;
 }
+/**日志 */
+function log(...msg) {
+    console.log.call(console, "%c[Request]", "color: cyan;", ...msg);
+}
 class Request {
     constructor() {
         /**默认请求配置 */
@@ -364,6 +368,7 @@ class Request {
         if (!isObject(setting)) {
             return;
         }
+        log("setting", "->", setting);
         if (isObject(setting.hooks)) {
             this.hooks = merge(this.hooks, setting.hooks);
         }
@@ -448,9 +453,10 @@ class Request {
                     if (Number(code) !== CODE_SUCCESS) {
                         const message = data.message || data.msg;
                         if (reqConf.autoToast && message && notification) {
-                            notification.error(notificationMsgFormater({
+                            notification(notificationMsgFormater({
                                 "description": message,
-                                "message": "请求错误"
+                                "message": "请求错误",
+                                "type": "fail"
                             }));
                         }
                         return reject(re);
@@ -511,6 +517,7 @@ Request.A = document.createElement("a");
  */
 function config(config) {
     const { successCode, hosts, apis, notifyMod, notifyMsgFormater } = config;
+    log("config", "->", config);
     if (!isUndefined(successCode)) {
         CODE_SUCCESS = successCode;
     }
