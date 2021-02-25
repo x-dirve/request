@@ -405,7 +405,7 @@ Request.prototype.run = function run (type, url, params, data, config) {
     }
     // 请求钩子
     if (isFunction(this.hooks.onRequest)) {
-        this.hooks.onRequest.call(this, params, data);
+        this.hooks.onRequest.call(this, reqConf, params, data);
     }
     // 解析地址
     url = this.resolveUri(url, params);

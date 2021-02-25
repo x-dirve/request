@@ -1,3 +1,8 @@
+## v1.0.4
+
+### Fix
+- fix: 修复 onRequest hook 参数错误问题 [56f85a7](https://github.com/x-dirve/request/commit/56f85a7f4bcbd9502e93127f4276e23c4b7d3e8e)
+
 ## v1.0.3
 
 ### Feat
