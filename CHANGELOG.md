@@ -1,3 +1,8 @@
+## v1.0.5
+
+### Feat
+- feat: 支持配置数据字段映射 [a170d5c](https://github.com/x-dirve/request/commit/a170d5c11a4cae21421c6679a4de9e9846ab581b)
+
 ## v1.0.4
 
 ### Fix
