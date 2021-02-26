@@ -49,15 +49,15 @@ type ReqSetting = {
     hooks?: ReqHooks;
 
     /**数据字段映射 */
-    keys:{
+    keys?:{
         /**业务数据字段 */
-        data:string;
+        data?:string;
 
         /**状态码字段 */
-        code:string;
+        code?:string;
 
         /**返回信息字段 */
-        message:string;
+        message?:string;
 
         [key:string]: string;
     };
