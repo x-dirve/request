@@ -257,6 +257,12 @@ var Request = function Request() {
     };
     /**请求钩子 */
     this.hooks = {};
+    /**字段映射对象 */
+    this.keys = {
+        "data": "data",
+        "code": "code",
+        "message": "message"
+    };
     // @ts-ignore
     var onRequest = function (config, params, data) { };
     var onResponse = function (raw) {
@@ -381,6 +387,9 @@ Request.prototype.setting = function setting (setting$1) {
     if (isObject(setting$1.hooks)) {
         this.hooks = merge(this.hooks, setting$1.hooks);
     }
+    if (isObject(setting$1.keys)) {
+        this.keys = merge(this.keys, setting$1.keys);
+    }
 };
 /**
  * 执行请求
@@ -463,10 +472,10 @@ Request.prototype.run = function run (type, url, params, data, config) {
                         return;
                     }
                 }
-                var data = re.data;
-                    var code = re.code;
+                var data = re[me.keys.data];
+                var code = re[me.keys.code];
                 if (Number(code) !== CODE_SUCCESS) {
-                    var message = data.message || data.msg;
+                    var message = re[me.keys.message];
                     if (reqConf.autoToast && message && notification) {
                         notification(notificationMsgFormater({
                             "description": message,
@@ -476,7 +485,7 @@ Request.prototype.run = function run (type, url, params, data, config) {
                     }
                     return reject(re);
                 }
-                resolve(config.raw ? data : re.data || {});
+                resolve(config.raw ? re : data || {});
             }
             else {
                 reject(new Error(("Request Error, status [" + (this.status) + "]")));

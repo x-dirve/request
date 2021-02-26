@@ -21,6 +21,16 @@ declare type ReqHooks = {
 declare type ReqSetting = {
     /**请求钩子 */
     hooks?: ReqHooks;
+    /**数据字段映射 */
+    keys: {
+        /**业务数据字段 */
+        data: string;
+        /**状态码字段 */
+        code: string;
+        /**返回信息字段 */
+        message: string;
+        [key: string]: string;
+    };
 };
 declare type HostSubject = {
     [name: string]: string;
@@ -68,6 +78,10 @@ declare class Request {
     private defConf;
     /**请求钩子 */
     hooks: ReqHooks;
+    /**字段映射对象 */
+    keys: {
+        [key: string]: string;
+    };
     constructor();
     /**检测是否同域用的 a 标签 */
     static A: any;

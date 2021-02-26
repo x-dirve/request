@@ -248,6 +248,12 @@ class Request {
         };
         /**请求钩子 */
         this.hooks = {};
+        /**字段映射对象 */
+        this.keys = {
+            "data": "data",
+            "code": "code",
+            "message": "message"
+        };
         // @ts-ignore
         var onRequest = (config, params, data) => { };
         var onResponse = (raw) => {
@@ -372,6 +378,9 @@ class Request {
         if (isObject(setting.hooks)) {
             this.hooks = merge(this.hooks, setting.hooks);
         }
+        if (isObject(setting.keys)) {
+            this.keys = merge(this.keys, setting.keys);
+        }
     }
     /**
      * 执行请求
@@ -449,9 +458,10 @@ class Request {
                             return;
                         }
                     }
-                    const { data, code } = re;
+                    const data = re[me.keys.data];
+                    const code = re[me.keys.code];
                     if (Number(code) !== CODE_SUCCESS) {
-                        const message = data.message || data.msg;
+                        const message = re[me.keys.message];
                         if (reqConf.autoToast && message && notification) {
                             notification(notificationMsgFormater({
                                 "description": message,
@@ -461,7 +471,7 @@ class Request {
                         }
                         return reject(re);
                     }
-                    resolve(config.raw ? data : re.data || {});
+                    resolve(config.raw ? re : data || {});
                 }
                 else {
                     reject(new Error(`Request Error, status [${this.status}]`));

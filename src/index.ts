@@ -46,7 +46,21 @@ type ReqHooks = {
 /**请求实例设置 */
 type ReqSetting = {
     /**请求钩子 */
-    hooks?: ReqHooks
+    hooks?: ReqHooks;
+
+    /**数据字段映射 */
+    keys:{
+        /**业务数据字段 */
+        data:string;
+
+        /**状态码字段 */
+        code:string;
+
+        /**返回信息字段 */
+        message:string;
+
+        [key:string]: string;
+    };
 }
 
 /**所有 api 存储对象 */
@@ -195,6 +209,13 @@ class Request {
     /**请求钩子 */
     hooks: ReqHooks = {};
 
+    /**字段映射对象 */
+    keys:{[key:string]: string} = {
+        "data": "data"
+        , "code": "code"
+        , "message": "message"
+    };
+
     constructor() {
         // @ts-ignore
         var onRequest = (config: ReqConf, params: ReqParams, data: ReqData) => { };
@@ -328,6 +349,10 @@ class Request {
         if (isObject(setting.hooks)) {
             this.hooks = merge(this.hooks, setting.hooks);
         }
+
+        if (isObject(setting.keys)) {
+            this.keys = merge(this.keys, setting.keys);
+        }
     }
 
     /**
@@ -420,9 +445,11 @@ class Request {
                         }
                     }
 
-                    const { data, code } = re;
+                    const data = re[me.keys.data];
+                    const code = re[me.keys.code];
+
                     if (Number(code) !== CODE_SUCCESS) {
-                        const message: string = data.message || data.msg;
+                        const message: string = re[me.keys.message];
                         if (reqConf.autoToast && message && notification) {
                             notification(
                                 notificationMsgFormater({
@@ -436,7 +463,7 @@ class Request {
                     }
 
                     resolve(
-                        config.raw ? data : re.data || {}
+                        config.raw ? re : data || {}
                     );
                 } else {
                     reject(new Error(`Request Error, status [${this.status}]`));
