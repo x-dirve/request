@@ -1,3 +1,8 @@
+## v1.0.6
+
+### Fix
+- fix: ReqSetting 中的配置应都是可选项 [79d8dbc](https://github.com/x-dirve/request/commit/79d8dbca68424d2b96357b61b8b9721024762284)
+
 ## v1.0.5
 
 ### Feat
