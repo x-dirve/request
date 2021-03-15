@@ -188,7 +188,7 @@ export function resloveUrl(uri: string, params?: ReqParams): string {
 }
 
 /**日志 */
-function log(...msg) {
+function log(...msg:any[]) {
     console.log.call(console, "%c[Request]", "color: cyan;", ...msg);
 }
 
@@ -293,9 +293,8 @@ class Request {
 
     /**
      * 解析生成正确的数据请求地址
-     * @param {String} url    接口别名或具体的请求地址
-     * @param {Object} params 请求参数对象
-     * @return {String}
+     * @param  url    接口别名或具体的请求地址
+     * @param  params 请求参数对象
      */
     resolveUri(uri: string, params: object) {
         return resloveUrl(uri, params);
@@ -306,7 +305,7 @@ class Request {
      * @param data post 数据
      * @return 处理过后的数据
      */
-    private parseData(data: string | object): string {
+    private parseData(data: string | object) {
         if (isString(data)) {
             return (data as string).replace(/\+/g, "%2B");
         }
@@ -357,12 +356,12 @@ class Request {
 
     /**
      * 执行请求
-     * @param   {String}  type    请求类型
-     * @param   {String}  url     请求url或别名
-     * @param   {Object}  param   请求参数
-     * @param   {Object}  data    请求数据
-     * @param   {ReqConf} config  请求配置
-     * @returns {Object}          请求 Promise 对象
+     * @param    type    请求类型
+     * @param    url     请求url或别名
+     * @param    param   请求参数
+     * @param    data    请求数据
+     * @param    config  请求配置
+     * @returns          请求 Promise 对象
      */
     run<T>(type: string, url: string, params: ReqParams = {}, data: ReqData = {}, config: ReqConf = {}): Promise<T> {
         type = type.toLocaleLowerCase();
@@ -488,10 +487,10 @@ class Request {
 
     /**
      * 发起一个 get 请求
-     * @param   {String}   url     请求url或别名
-     * @param   {Object}   param   请求参数
-     * @param   {ReqConf}  config  请求配置
-     * @returns {Object}
+     * @param   url     请求url或别名
+     * @param   param   请求参数
+     * @param   config  请求配置
+     * @returns 
      */
     get(url: string, param?: ReqParams, config?: ReqConf) {
         return this.run("GET", url, param, {}, config);
@@ -499,11 +498,11 @@ class Request {
 
     /**
      * 发起一个 post 请求
-     * @param   {String}  url      请求url或别名
-     * @param   {Object}  param    请求参数
-     * @param   {Object}  data     请求数据
-     * @param   {ReqConf} config  请求配置
-     * @returns {Object}
+     * @param    url      请求url或别名
+     * @param    param    请求参数
+     * @param    data     请求数据
+     * @param    config   请求配置
+     * @returns
      */
     post(url: string, param?: ReqParams, data?: ReqData, config?: ReqConf) {
         if (isObject(param) && isUndefined(data)) {
