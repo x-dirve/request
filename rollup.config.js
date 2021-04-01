@@ -3,9 +3,11 @@ const alias = require("rollup-plugin-alias");
 const buble = require("rollup-plugin-buble");
 const babel = require("rollup-plugin-babel");
 const cjs = require("rollup-plugin-commonjs");
+const { terser } = require("rollup-plugin-terser");
 const resolve = require("rollup-plugin-node-resolve");
 const typescript = require("rollup-plugin-typescript2");
 
+const isProduction = process.env.NODE_ENV === "production";
 const cwd = __dirname;
 
 const baseConfig = {
@@ -53,6 +55,25 @@ const baseConfig = {
         ,buble()
     ]
 }
+
+const umdConfig = {
+    "input": baseConfig.input
+    , "output": [
+        {
+            "file": join(cwd, "dist/index.umd.js")
+            , "format": "umd"
+            , "sourcemap": false
+            , "exports": "named"
+            , "name": "xRequest"
+        }
+    ]
+    , "plugins": [
+        ...baseConfig.plugins
+        , isProduction && terser()
+    ]
+}
+
+
 const esmConfig = Object.assign({}, baseConfig, {
     output: Object.assign({}, baseConfig.output, {
         "sourcemap": true
@@ -101,7 +122,7 @@ function rollup() {
     } else if (target === "esm") {
         return esmConfig
     } else {
-        return [baseConfig, esmConfig]
+        return [baseConfig, umdConfig, esmConfig]
     }
 }
 module.exports = rollup()

@@ -47,6 +47,17 @@
 
 ## 使用方式
 
+### 引用方式
+- `require` 或 `import` 方式引用
+    ```typescript
+    import Request from "@x-drive/request";
+    ```
+- 页面直接用 `script` 标签引用
+    ```html
+    <script src="https://your_static_files/index.umd.js"></script>
+    ```
+    注意这种方式如果直接在浏览器中使用时，模块名称会被重命名为 `xRequest`。
+
 ### 请求方法
 - `get` 发起一个 get 请求 
     ```ts

@@ -326,9 +326,8 @@ class Request {
     }
     /**
      * 解析生成正确的数据请求地址
-     * @param {String} url    接口别名或具体的请求地址
-     * @param {Object} params 请求参数对象
-     * @return {String}
+     * @param  url    接口别名或具体的请求地址
+     * @param  params 请求参数对象
      */
     resolveUri(uri, params) {
         return resloveUrl(uri, params);
@@ -384,12 +383,12 @@ class Request {
     }
     /**
      * 执行请求
-     * @param   {String}  type    请求类型
-     * @param   {String}  url     请求url或别名
-     * @param   {Object}  param   请求参数
-     * @param   {Object}  data    请求数据
-     * @param   {ReqConf} config  请求配置
-     * @returns {Object}          请求 Promise 对象
+     * @param    type    请求类型
+     * @param    url     请求url或别名
+     * @param    param   请求参数
+     * @param    data    请求数据
+     * @param    config  请求配置
+     * @returns          请求 Promise 对象
      */
     run(type, url, params = {}, data = {}, config = {}) {
         type = type.toLocaleLowerCase();
@@ -492,21 +491,21 @@ class Request {
     }
     /**
      * 发起一个 get 请求
-     * @param   {String}   url     请求url或别名
-     * @param   {Object}   param   请求参数
-     * @param   {ReqConf}  config  请求配置
-     * @returns {Object}
+     * @param   url     请求url或别名
+     * @param   param   请求参数
+     * @param   config  请求配置
+     * @returns
      */
     get(url, param, config) {
         return this.run("GET", url, param, {}, config);
     }
     /**
      * 发起一个 post 请求
-     * @param   {String}  url      请求url或别名
-     * @param   {Object}  param    请求参数
-     * @param   {Object}  data     请求数据
-     * @param   {ReqConf} config  请求配置
-     * @returns {Object}
+     * @param    url      请求url或别名
+     * @param    param    请求参数
+     * @param    data     请求数据
+     * @param    config   请求配置
+     * @returns
      */
     post(url, param, data, config) {
         if (isObject(param) && isUndefined(data)) {

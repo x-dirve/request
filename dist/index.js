@@ -335,9 +335,8 @@ Request.randomStr = function randomStr () {
 };
 /**
  * 解析生成正确的数据请求地址
- * @param {String} url接口别名或具体的请求地址
- * @param {Object} params 请求参数对象
- * @return {String}
+ * @param  url接口别名或具体的请求地址
+ * @param  params 请求参数对象
  */
 Request.prototype.resolveUri = function resolveUri (uri, params) {
     return resloveUrl(uri, params);
@@ -393,12 +392,12 @@ Request.prototype.setting = function setting (setting$1) {
 };
 /**
  * 执行请求
- * @param   {String}  type请求类型
- * @param   {String}  url 请求url或别名
- * @param   {Object}  param   请求参数
- * @param   {Object}  data请求数据
- * @param   {ReqConf} config  请求配置
- * @returns {Object}      请求 Promise 对象
+ * @paramtype请求类型
+ * @paramurl 请求url或别名
+ * @paramparam   请求参数
+ * @paramdata请求数据
+ * @paramconfig  请求配置
+ * @returns      请求 Promise 对象
  */
 Request.prototype.run = function run (type, url, params, data, config) {
         var this$1 = this;
@@ -506,21 +505,21 @@ Request.prototype.run = function run (type, url, params, data, config) {
 };
 /**
  * 发起一个 get 请求
- * @param   {String}   url 请求url或别名
- * @param   {Object}   param   请求参数
- * @param   {ReqConf}  config  请求配置
- * @returns {Object}
+ * @param   url 请求url或别名
+ * @param   param   请求参数
+ * @param   config  请求配置
+ * @returns
  */
 Request.prototype.get = function get (url, param, config) {
     return this.run("GET", url, param, {}, config);
 };
 /**
  * 发起一个 post 请求
- * @param   {String}  url  请求url或别名
- * @param   {Object}  param请求参数
- * @param   {Object}  data 请求数据
- * @param   {ReqConf} config  请求配置
- * @returns {Object}
+ * @paramurl  请求url或别名
+ * @paramparam请求参数
+ * @paramdata 请求数据
+ * @paramconfig   请求配置
+ * @returns
  */
 Request.prototype.post = function post (url, param, data, config) {
     if (isObject(param) && isUndefined(data)) {
