@@ -1,3 +1,8 @@
+## v1.0.7
+
+### Feat
+- feat: 支持 umd 模式 [5c752dd](https://github.com/x-dirve/request/commit/5c752dd850bf6ac262cbb193c6bbe03b0eba8813)
+
 ## v1.0.6
 
 ### Fix
