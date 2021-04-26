@@ -1,3 +1,8 @@
+## v1.0.8
+
+### Fix
+- fix: 修正 get、post 返回类型定义问题 [55aba7e](https://github.com/x-dirve/request/commit/55aba7e44f679a1cbda4203611344806be97803e)
+
 ## v1.0.7
 
 ### Feat
