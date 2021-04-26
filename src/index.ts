@@ -31,8 +31,11 @@ var notificationMsgFormater = function (msg: ErrorMsg) {
     return msg;
 }
 
-type ApiSubject = { 
+interface AnySubject {
     [key: string]: string;
+}
+
+interface ApiSubject extends AnySubject {
 }
 
 /**请求钩子 */
@@ -363,7 +366,7 @@ class Request {
      * @param    config  请求配置
      * @returns          请求 Promise 对象
      */
-    run<T>(type: string, url: string, params: ReqParams = {}, data: ReqData = {}, config: ReqConf = {}): Promise<T> {
+    run<T = AnySubject>(type: string, url: string, params: ReqParams = {}, data: ReqData = {}, config: ReqConf = {}): Promise<T> {
         type = type.toLocaleLowerCase();
 
         var reqConf: ReqConf = merge(
@@ -492,8 +495,8 @@ class Request {
      * @param   config  请求配置
      * @returns 
      */
-    get(url: string, param?: ReqParams, config?: ReqConf) {
-        return this.run("GET", url, param, {}, config);
+    get<T = AnySubject>(url: string, param?: ReqParams, config?: ReqConf) {
+        return this.run<T>("GET", url, param, {}, config);
     }
 
     /**
@@ -504,7 +507,7 @@ class Request {
      * @param    config   请求配置
      * @returns
      */
-    post(url: string, param?: ReqParams, data?: ReqData, config?: ReqConf) {
+    post<T = AnySubject>(url: string, param?: ReqParams, data?: ReqData, config?: ReqConf) {
         if (isObject(param) && isUndefined(data)) {
             data = param;
             param = {};
@@ -512,7 +515,7 @@ class Request {
         if (isUndefined(data)) {
             data = {};
         }
-        return this.run("POST", url, param, data, config);
+        return this.run<T>("POST", url, param, data, config);
     }
 }
 

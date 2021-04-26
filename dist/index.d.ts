@@ -7,9 +7,11 @@ declare type ErrorMsg = {
     /**提示类型 */
     type: string;
 };
-declare type ApiSubject = {
+interface AnySubject {
     [key: string]: string;
-};
+}
+interface ApiSubject extends AnySubject {
+}
 /**请求钩子 */
 declare type ReqHooks = {
     /**请求前钩子 */
@@ -137,7 +139,7 @@ declare class Request {
      * @param    config  请求配置
      * @returns          请求 Promise 对象
      */
-    run<T>(type: string, url: string, params?: ReqParams, data?: ReqData, config?: ReqConf): Promise<T>;
+    run<T = AnySubject>(type: string, url: string, params?: ReqParams, data?: ReqData, config?: ReqConf): Promise<T>;
     /**
      * 发起一个 get 请求
      * @param   url     请求url或别名
@@ -145,7 +147,7 @@ declare class Request {
      * @param   config  请求配置
      * @returns
      */
-    get(url: string, param?: ReqParams, config?: ReqConf): Promise<unknown>;
+    get<T = AnySubject>(url: string, param?: ReqParams, config?: ReqConf): Promise<T>;
     /**
      * 发起一个 post 请求
      * @param    url      请求url或别名
@@ -154,7 +156,7 @@ declare class Request {
      * @param    config   请求配置
      * @returns
      */
-    post(url: string, param?: ReqParams, data?: ReqData, config?: ReqConf): Promise<unknown>;
+    post<T = AnySubject>(url: string, param?: ReqParams, data?: ReqData, config?: ReqConf): Promise<T>;
 }
 export { Request as R };
 declare type ConfigOption = {
