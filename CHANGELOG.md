@@ -1,3 +1,8 @@
+## v1.0.9
+
+### Feat
+- feat: 新增请求错误处理钩子 [9622e65](https://github.com/x-dirve/request/commit/9622e65a3aac3ee6bc124dc0dbf5b7a2325ea936)
+
 ## v1.0.8
 
 ### Fix
