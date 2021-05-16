@@ -15,9 +15,11 @@ interface ApiSubject extends AnySubject {
 /**请求钩子 */
 declare type ReqHooks = {
     /**请求前钩子 */
-    onRequest?: (config: ReqConf, params: ReqParams, data: ReqData) => void;
+    onRequest?: (config?: ReqConf, params?: ReqParams, data?: ReqData) => void;
     /**请求后钩子 */
-    onResponse?: (raw: string) => any;
+    onResponse?: (raw?: string) => any;
+    /**请求失败钩子 */
+    onResponseError?: (re?: any) => boolean;
 };
 /**请求实例设置 */
 declare type ReqSetting = {

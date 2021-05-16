@@ -268,10 +268,15 @@ var Request = function Request() {
     var onResponse = function (raw) {
         return raw;
     };
+    // @ts-ignore
+    var onResponseError = function (re) {
+        return true;
+    };
     // 默认 hook
     this.hooks = {
         onRequest: onRequest,
-        onResponse: onResponse
+        onResponse: onResponse,
+        onResponseError: onResponseError
     };
 };
 /**
@@ -482,6 +487,7 @@ Request.prototype.run = function run (type, url, params, data, config) {
                             "type": "fail"
                         }));
                     }
+                    me.hooks.onResponseError(re);
                     return reject(re);
                 }
                 resolve(config.raw ? re : data || {});

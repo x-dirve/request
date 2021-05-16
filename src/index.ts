@@ -41,9 +41,11 @@ interface ApiSubject extends AnySubject {
 /**请求钩子 */
 type ReqHooks = {
     /**请求前钩子 */
-    onRequest?: (config: ReqConf, params: ReqParams, data: ReqData) => void;
+    onRequest?: (config?: ReqConf, params?: ReqParams, data?: ReqData) => void;
     /**请求后钩子 */
-    onResponse?: (raw:string) => any;
+    onResponse?: (raw?:string) => any;
+    /**请求失败钩子 */
+    onResponseError?: (re?:any) => boolean;
 }
 
 /**请求实例设置 */
@@ -221,14 +223,19 @@ class Request {
 
     constructor() {
         // @ts-ignore
-        var onRequest = (config: ReqConf, params: ReqParams, data: ReqData) => { };
-        var onResponse = (raw: string) => {
+        const onRequest = (config: ReqConf, params: ReqParams, data: ReqData) => { };
+        const onResponse = (raw: string) => {
             return raw;
+        }
+        // @ts-ignore
+        const onResponseError = (re:any) => {
+            return true;
         }
         // 默认 hook
         this.hooks = {
             onRequest
             , onResponse
+            , onResponseError
         }
     }
 
@@ -461,6 +468,7 @@ class Request {
                                 })
                             );
                         }
+                        me.hooks.onResponseError(re);
                         return reject(re);
                     }
 

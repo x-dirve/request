@@ -255,14 +255,19 @@ class Request {
             "message": "message"
         };
         // @ts-ignore
-        var onRequest = (config, params, data) => { };
-        var onResponse = (raw) => {
+        const onRequest = (config, params, data) => { };
+        const onResponse = (raw) => {
             return raw;
+        };
+        // @ts-ignore
+        const onResponseError = (re) => {
+            return true;
         };
         // 默认 hook
         this.hooks = {
             onRequest,
-            onResponse
+            onResponse,
+            onResponseError
         };
     }
     /**
@@ -468,6 +473,7 @@ class Request {
                                 "type": "fail"
                             }));
                         }
+                        me.hooks.onResponseError(re);
                         return reject(re);
                     }
                     resolve(config.raw ? re : data || {});
