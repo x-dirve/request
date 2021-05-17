@@ -1,3 +1,8 @@
+## v1.0.10
+
+### Feat
+- feat: 配置相关 log 只会在开发环境中输出 [ca80117](https://github.com/x-dirve/request/commit/ca8011701cd4d813c1362a80c39ace41e702c8ea)
+
 ## v1.0.9
 
 ### Feat
