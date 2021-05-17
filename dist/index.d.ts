@@ -176,8 +176,9 @@ declare type ConfigOption = {
 /**
  * 设置请求模块
  * @param config 模块配置
+ * @param mode   所处环境
  */
-declare function config(config: ConfigOption): void;
+declare function config(config: ConfigOption, mode?: "prod" | "dev"): void;
 export { config };
 declare const _default: Request;
 export default _default;

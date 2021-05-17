@@ -10,6 +10,8 @@ import {
     isFunction
 } from "@x-drive/utils";
 
+var isDev = false;
+
 /**自动提示用的浮层 */
 var notification:any;
 
@@ -354,7 +356,9 @@ class Request {
         if (!isObject(setting)) {
             return;
         }
-        log("setting","->", setting);
+        if (isDev) {
+            log("setting","->", setting);
+        }
         if (isObject(setting.hooks)) {
             this.hooks = merge(this.hooks, setting.hooks);
         }
@@ -549,11 +553,16 @@ type ConfigOption = {
 /**
  * 设置请求模块
  * @param config 模块配置
+ * @param mode   所处环境
  */
-function config(config: ConfigOption) {
+function config(config: ConfigOption, mode: "prod" | "dev" = "prod") {
+    isDev = mode !== "prod";
+
     const { successCode, hosts, apis, notifyMod, notifyMsgFormater } = config;
-    
-    log("config", "->", config);
+
+    if (isDev) {
+        log("config", "->", config);
+    }
 
     if (!isUndefined(successCode)) {
         CODE_SUCCESS = successCode;

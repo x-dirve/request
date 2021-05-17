@@ -165,6 +165,7 @@ function queryString(dat) {
     return queryStr;
 }
 
+var isDev = false;
 /**自动提示用的浮层 */
 var notification;
 /**出错信息提示格式化函数 */
@@ -387,7 +388,9 @@ Request.prototype.setting = function setting (setting$1) {
     if (!isObject(setting$1)) {
         return;
     }
-    log("setting", "->", setting$1);
+    if (isDev) {
+        log("setting", "->", setting$1);
+    }
     if (isObject(setting$1.hooks)) {
         this.hooks = merge(this.hooks, setting$1.hooks);
     }
@@ -542,14 +545,20 @@ Request.A = document.createElement("a");
 /**
  * 设置请求模块
  * @param config 模块配置
+ * @param mode   所处环境
  */
-function config(config) {
+function config(config, mode) {
+    if ( mode === void 0 ) mode = "prod";
+
+    isDev = mode !== "prod";
     var successCode = config.successCode;
     var hosts = config.hosts;
     var apis = config.apis;
     var notifyMod = config.notifyMod;
     var notifyMsgFormater = config.notifyMsgFormater;
-    log("config", "->", config);
+    if (isDev) {
+        log("config", "->", config);
+    }
     if (!isUndefined(successCode)) {
         CODE_SUCCESS = successCode;
     }
