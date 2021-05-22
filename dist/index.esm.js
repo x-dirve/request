@@ -534,8 +534,8 @@ Request.A = document.createElement("a");
  * @param config 模块配置
  * @param mode   所处环境
  */
-function config(config, mode = "prod") {
-    isDev = mode !== "prod";
+function config(config, mode = "production") {
+    isDev = mode !== "production";
     const { successCode, hosts, apis, notifyMod, notifyMsgFormater } = config;
     if (isDev) {
         log("config", "->", config);

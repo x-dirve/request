@@ -548,9 +548,9 @@ Request.A = document.createElement("a");
  * @param mode   所处环境
  */
 function config(config, mode) {
-    if ( mode === void 0 ) mode = "prod";
+    if ( mode === void 0 ) mode = "production";
 
-    isDev = mode !== "prod";
+    isDev = mode !== "production";
     var successCode = config.successCode;
     var hosts = config.hosts;
     var apis = config.apis;

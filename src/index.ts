@@ -555,8 +555,8 @@ type ConfigOption = {
  * @param config 模块配置
  * @param mode   所处环境
  */
-function config(config: ConfigOption, mode: "prod" | "dev" = "prod") {
-    isDev = mode !== "prod";
+function config(config: ConfigOption, mode: "development" | "production" | "test" = "production") {
+    isDev = mode !== "production";
 
     const { successCode, hosts, apis, notifyMod, notifyMsgFormater } = config;
 
