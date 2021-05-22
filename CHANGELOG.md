@@ -1,3 +1,8 @@
+## v1.0.11
+
+### Fix
+- fix: config 函数第二个参数接收的环境名称由 dev | prod 改为 development | production | test [1feb8e1](https://github.com/x-dirve/request/commit/1feb8e1a7b2ff515b50d23aae4fd2179dcdac73c)
+
 ## v1.0.10
 
 ### Feat
