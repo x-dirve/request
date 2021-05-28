@@ -1,3 +1,8 @@
+## v1.0.12
+
+### Feat
+- feat: 增加 onResponseError 钩子，更新相关说明文档 [99b3425](https://github.com/x-dirve/request/commit/99b3425dac610e3f8366c8827cdd3f1d025dfd92)
+
 ## v1.0.11
 
 ### Fix
