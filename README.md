@@ -105,3 +105,21 @@
 ### 额外的实例
 
 模块默认在全局会生成一个通用的请求实例，方便对所有的请求进行管理。同时也以 `R` 导出了模块，支持使用者单独实例化另外的请求实例用于其他用途。
+
+### Hooks
+目前只支持实例 Hooks，也即是说只支持通过 `setting` 函数设置的钩子
+- `onRequest` 请求前钩子
+    ```ts
+    /**请求前钩子 */
+    onRequest?: (config?: ReqConf, params?: ReqParams, data?: ReqData) => void;
+    ```
+- `onResponse` 请求后钩子
+    ```ts
+    /**请求后钩子 */
+    onResponse?: (raw?: string, config?: ReqConf, params?: ReqParams, data?: ReqData) => any;
+    ```
+- `onResponseError` 请求失败钩子
+    ```ts
+    /**请求失败钩子 */
+    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf) => boolean;
+    ```

@@ -7,19 +7,21 @@ declare type ErrorMsg = {
     /**提示类型 */
     type: string;
 };
+/**环境 */
+declare type Mode = "development" | "production" | "test";
 interface AnySubject {
     [key: string]: string;
 }
-interface ApiSubject extends AnySubject {
-}
+/**错误类型 */
+declare type ReqErrorTypes = "Business" | "Net" | "Timeout";
 /**请求钩子 */
 declare type ReqHooks = {
     /**请求前钩子 */
     onRequest?: (config?: ReqConf, params?: ReqParams, data?: ReqData) => void;
     /**请求后钩子 */
-    onResponse?: (raw?: string) => any;
+    onResponse?: (raw?: string, config?: ReqConf, params?: ReqParams, data?: ReqData) => any;
     /**请求失败钩子 */
-    onResponseError?: (re?: any) => boolean;
+    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf) => boolean;
 };
 /**请求实例设置 */
 declare type ReqSetting = {
@@ -35,9 +37,6 @@ declare type ReqSetting = {
         message?: string;
         [key: string]: string;
     };
-};
-declare type HostSubject = {
-    [name: string]: string;
 };
 /**
  * 请求配置
@@ -95,7 +94,7 @@ declare class Request {
      * @param  subject  模块 api 设置
      * @param  host     api 请求域名
      */
-    static register(subject: ApiSubject, host?: string): void;
+    static register(subject: Record<string, string>, host?: string): void;
     /**
      * 放弃当前正在发起的所有请求
      */
@@ -165,9 +164,9 @@ declare type ConfigOption = {
     /**请求成功时的状态码 */
     successCode?: number | string;
     /**域名配置 */
-    hosts?: HostSubject;
+    hosts?: Record<string, string>;
     /**api 别名 */
-    apis?: ApiSubject;
+    apis?: Record<string, string>;
     /**提示浮层 */
     notifyMod?: any;
     /**提示信息格式化函数 */
@@ -178,7 +177,7 @@ declare type ConfigOption = {
  * @param config 模块配置
  * @param mode   所处环境
  */
-declare function config(config: ConfigOption, mode?: "development" | "production" | "test"): void;
+declare function config(config: ConfigOption, mode?: Mode): void;
 export { config };
 declare const _default: Request;
 export default _default;

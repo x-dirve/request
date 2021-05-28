@@ -10,11 +10,6 @@ import {
     isFunction
 } from "@x-drive/utils";
 
-var isDev = false;
-
-/**自动提示用的浮层 */
-var notification:any;
-
 /**接口错误时的提示信息 */
 type ErrorMsg = {
     /**错误详情 */
@@ -27,6 +22,8 @@ type ErrorMsg = {
     type: string;
 }
 
+/**环境 */
+type Mode = "development" | "production" | "test";
 
 /**出错信息提示格式化函数 */
 var notificationMsgFormater = function (msg: ErrorMsg) {
@@ -37,17 +34,17 @@ interface AnySubject {
     [key: string]: string;
 }
 
-interface ApiSubject extends AnySubject {
-}
+/**错误类型 */
+type ReqErrorTypes = "Business" | "Net" | "Timeout";
 
 /**请求钩子 */
 type ReqHooks = {
     /**请求前钩子 */
     onRequest?: (config?: ReqConf, params?: ReqParams, data?: ReqData) => void;
     /**请求后钩子 */
-    onResponse?: (raw?:string) => any;
+    onResponse?: (raw?: string, config?: ReqConf, params?: ReqParams, data?: ReqData) => any;
     /**请求失败钩子 */
-    onResponseError?: (re?:any) => boolean;
+    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf) => boolean;
 }
 
 /**请求实例设置 */
@@ -56,29 +53,30 @@ type ReqSetting = {
     hooks?: ReqHooks;
 
     /**数据字段映射 */
-    keys?:{
+    keys?: {
         /**业务数据字段 */
-        data?:string;
+        data?: string;
 
         /**状态码字段 */
-        code?:string;
+        code?: string;
 
         /**返回信息字段 */
-        message?:string;
+        message?: string;
 
-        [key:string]: string;
+        [key: string]: string;
     };
 }
 
-/**所有 api 存储对象 */
-const APIS: ApiSubject = {};
+var isDev = false;
 
-type HostSubject = {
-    [name: string]: string;
-}
+/**自动提示用的浮层 */
+var notification:any;
+
+/**所有 api 存储对象 */
+const APIS: Record<string, string> = {};
 
 /**所有域名存储对象 */
-const HOSTS: HostSubject = {};
+const HOSTS: Record<string, string> = {};
 
 /**请求成功状态码 */
 var CODE_SUCCESS: number | string = 1;
@@ -250,7 +248,7 @@ class Request {
      * @param  subject  模块 api 设置
      * @param  host     api 请求域名
      */
-    static register(subject: ApiSubject, host?: string): void {
+    static register(subject: Record<string, string>, host?: string): void {
         if (isObject(subject)) {
             each(subject, (val, key) => {
                 if (APIS[key]) {
@@ -446,7 +444,7 @@ class Request {
                     var re: any = this.responseText;
                     // 返回钩子
                     if (isFunction(me.hooks.onResponse)) {
-                        me.hooks.onResponse.call(me, re);
+                        me.hooks.onResponse.call(me, re, config, params, reqData);
                     }
 
                     if (reqConf.dataType === "json") {
@@ -472,7 +470,7 @@ class Request {
                                 })
                             );
                         }
-                        me.hooks.onResponseError(re);
+                        me.hooks.onResponseError(re, "Business", reqConf);
                         return reject(re);
                     }
 
@@ -484,8 +482,16 @@ class Request {
                 }
             }
 
+            xhr.onerror = function() {
+                me.hooks.onResponseError({}, "Net", reqConf);
+                reject(
+                    new Error(`Request Error,[${type}] >> ${url}`)
+                );
+            }
+
             xhr.ontimeout = xhr.onerror = function (e) {
                 spliceQueue(this);
+                me.hooks.onResponseError({}, "Timeout", reqConf);
                 reject(e);
             }
 
@@ -538,10 +544,10 @@ type ConfigOption = {
     successCode?: number|string;
 
     /**域名配置 */
-    hosts?: HostSubject;
+    hosts?: Record<string, string>;
 
     /**api 别名 */
-    apis?:ApiSubject;
+    apis?:Record<string, string>;
 
     /**提示浮层 */
     notifyMod?:any;
@@ -555,7 +561,7 @@ type ConfigOption = {
  * @param config 模块配置
  * @param mode   所处环境
  */
-function config(config: ConfigOption, mode: "development" | "production" | "test" = "production") {
+function config(config: ConfigOption, mode: Mode = "production") {
     isDev = mode !== "production";
 
     const { successCode, hosts, apis, notifyMod, notifyMsgFormater } = config;
@@ -586,6 +592,7 @@ function config(config: ConfigOption, mode: "development" | "production" | "test
         notificationMsgFormater = notifyMsgFormater;
     }
 }
+
 export { config }
 
 export default new Request();

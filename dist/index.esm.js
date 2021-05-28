@@ -159,13 +159,13 @@ function queryString(dat) {
     return queryStr;
 }
 
-var isDev = false;
-/**自动提示用的浮层 */
-var notification;
 /**出错信息提示格式化函数 */
 var notificationMsgFormater = function (msg) {
     return msg;
 };
+var isDev = false;
+/**自动提示用的浮层 */
+var notification;
 /**所有 api 存储对象 */
 const APIS = {};
 /**所有域名存储对象 */
@@ -454,7 +454,7 @@ class Request {
                     var re = this.responseText;
                     // 返回钩子
                     if (isFunction(me.hooks.onResponse)) {
-                        me.hooks.onResponse.call(me, re);
+                        me.hooks.onResponse.call(me, re, config, params, reqData);
                     }
                     if (reqConf.dataType === "json") {
                         try {
@@ -476,7 +476,7 @@ class Request {
                                 "type": "fail"
                             }));
                         }
-                        me.hooks.onResponseError(re);
+                        me.hooks.onResponseError(re, "Business", reqConf);
                         return reject(re);
                     }
                     resolve(config.raw ? re : data || {});
@@ -485,8 +485,13 @@ class Request {
                     reject(new Error(`Request Error, status [${this.status}]`));
                 }
             };
+            xhr.onerror = function () {
+                me.hooks.onResponseError({}, "Net", reqConf);
+                reject(new Error(`Request Error,[${type}] >> ${url}`));
+            };
             xhr.ontimeout = xhr.onerror = function (e) {
                 spliceQueue(this);
+                me.hooks.onResponseError({}, "Timeout", reqConf);
                 reject(e);
             };
             xhr.send(reqData);
