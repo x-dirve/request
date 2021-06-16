@@ -1,3 +1,8 @@
+## v1.0.14
+
+### Fix
+- fix: cancel 方法的参数改为非必传 [07d057b](https://github.com/x-dirve/request/commit/07d057b8ff6df13351749f627131e43f02d8a7ed)
+
 ## v1.0.13
 
 ### Feat
