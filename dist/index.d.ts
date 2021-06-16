@@ -71,9 +71,8 @@ interface ReqData {
 }
 /**
  * 解析生成正确的数据请求地址
- * @param  {String} url    接口别名或具体的请求地址
- * @param  {Object} params 请求参数对象
- * @return {String}
+ * @param  url    接口别名或具体的请求地址
+ * @param  params 请求参数对象
  */
 export declare function resloveUrl(uri: string, params?: ReqParams): string;
 declare class Request {
@@ -97,8 +96,9 @@ declare class Request {
     static register(subject: Record<string, string>, host?: string): void;
     /**
      * 放弃当前正在发起的所有请求
+     * @param keyname 指定清除的页面请求
      */
-    static cancel(): void;
+    static cancel(keyname: string): void;
     /**
      * 生成一个 16 进制的随机数
      */

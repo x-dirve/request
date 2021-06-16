@@ -147,6 +147,14 @@ function isString(subject) {
 }
 
 /**
+ * 是否是数字
+ * @param  subject 待判断的数据
+ */
+function isNumber(subject) {
+    return !isNaN(subject) && is(subject, "number");
+}
+
+/**
  * 请求参数对象转成请求参数字符串
  * @param dat 请求参数
  */
@@ -192,8 +200,7 @@ var API_REQ_PATH_REG_EXP = /^\//i;
 var RequestQueue = {};
 /**
  * 加入到列表
- * @param  {Object} key 当前的页面对象
- * @param  {Object} val 请求对象
+ * @param  val 请求对象
  */
 var pushQueue = function (val) {
     var pathname = window.location.pathname;
@@ -204,8 +211,7 @@ var pushQueue = function (val) {
 };
 /**
  * 从列表删除一个请求
- * @param  {Object} key 当前页面对象
- * @param  {Object} val 请求对象
+ * @param  val 请求对象
  */
 var spliceQueue = function (val) {
     var pathname = window.location.pathname;
@@ -218,9 +224,8 @@ var spliceQueue = function (val) {
 };
 /**
  * 解析生成正确的数据请求地址
- * @param  {String} url    接口别名或具体的请求地址
- * @param  {Object} params 请求参数对象
- * @return {String}
+ * @param  url    接口别名或具体的请求地址
+ * @param  params 请求参数对象
  */
 function resloveUrl(uri, params) {
     var oUri = uri;
@@ -314,9 +319,10 @@ Request.register = function register (subject, host) {
 };
 /**
  * 放弃当前正在发起的所有请求
+ * @param keyname 指定清除的页面请求
  */
-Request.cancel = function cancel () {
-    var pathname = window.location.pathname;
+Request.cancel = function cancel (keyname) {
+    var pathname = isString(keyname) ? keyname : window.location.pathname;
     var nowReqs = RequestQueue[pathname];
     if (nowReqs && nowReqs.length) {
         try {
@@ -454,7 +460,7 @@ Request.prototype.run = function run (type, url, params, data, config) {
             }
             delete header["X-Requested-With"];
         }
-        if (config.timeout) {
+        if (isNumber(config.timeout)) {
             xhr.timeout = config.timeout;
         }
         xhr.open(type, url, true);

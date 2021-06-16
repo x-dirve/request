@@ -7,7 +7,8 @@ import {
     queryString,
     labelReplace,
     labelReplaceExp,
-    isFunction
+    isFunction,
+    isNumber
 } from "@x-drive/utils";
 
 /**接口错误时的提示信息 */
@@ -146,8 +147,7 @@ const RequestQueue: object = {};
 
 /**
  * 加入到列表
- * @param  {Object} key 当前的页面对象
- * @param  {Object} val 请求对象
+ * @param  val 请求对象
  */
 const pushQueue = function (val: XMLHttpRequest) {
     const pathname = window.location.pathname;
@@ -159,8 +159,7 @@ const pushQueue = function (val: XMLHttpRequest) {
 
 /**
  * 从列表删除一个请求
- * @param  {Object} key 当前页面对象
- * @param  {Object} val 请求对象
+ * @param  val 请求对象
  */
 const spliceQueue = function (val: XMLHttpRequest) {
     const pathname = window.location.pathname;
@@ -174,11 +173,10 @@ const spliceQueue = function (val: XMLHttpRequest) {
 
 /**
  * 解析生成正确的数据请求地址
- * @param  {String} url    接口别名或具体的请求地址
- * @param  {Object} params 请求参数对象
- * @return {String}
+ * @param  url    接口别名或具体的请求地址
+ * @param  params 请求参数对象
  */
-export function resloveUrl(uri: string, params?: ReqParams): string {
+export function resloveUrl(uri: string, params?: ReqParams) {
     var oUri = uri;
     uri = APIS[uri];
     uri = uri || oUri;
@@ -275,9 +273,10 @@ class Request {
 
     /**
      * 放弃当前正在发起的所有请求
+     * @param keyname 指定清除的页面请求
      */
-    static cancel() {
-        const pathname = window.location.pathname;
+    static cancel(keyname:string) {
+        const pathname = isString(keyname) ? keyname : window.location.pathname;
         var nowReqs = RequestQueue[pathname];
         if (nowReqs && nowReqs.length) {
             try {
@@ -427,13 +426,13 @@ class Request {
                 delete header["X-Requested-With"];
             }
 
-            if (config.timeout) {
+            if (isNumber(config.timeout)) {
                 xhr.timeout = config.timeout;
             }
 
             xhr.open(type, url, true);
 
-            each(header, (val, key) => {
+            each(header, (val:string, key:string) => {
                 xhr.setRequestHeader(key, val);
             });
 
