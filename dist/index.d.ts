@@ -98,7 +98,7 @@ declare class Request {
      * 放弃当前正在发起的所有请求
      * @param keyname 指定清除的页面请求
      */
-    static cancel(keyname: string): void;
+    static cancel(keyname?: string): void;
     /**
      * 生成一个 16 进制的随机数
      */

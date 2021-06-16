@@ -1,6 +1,6 @@
 {
     "name": "@x-drive/request",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "description": "支持自动域名替换、接口别名的简易请求模块",
     "author": "digiaries <digiaries@hotmail.com>",
     "license": "MIT",

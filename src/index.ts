@@ -275,7 +275,7 @@ class Request {
      * 放弃当前正在发起的所有请求
      * @param keyname 指定清除的页面请求
      */
-    static cancel(keyname:string) {
+    static cancel(keyname?:string) {
         const pathname = isString(keyname) ? keyname : window.location.pathname;
         var nowReqs = RequestQueue[pathname];
         if (nowReqs && nowReqs.length) {
