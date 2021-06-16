@@ -1,3 +1,8 @@
+## v1.0.13
+
+### Feat
+- feat: cancel 方法支持清除指定页面的请求 [f93d091](https://github.com/x-dirve/request/commit/f93d0918923ba13d7242c70c1bab18bc1148e395)
+
 ## v1.0.12
 
 ### Feat
