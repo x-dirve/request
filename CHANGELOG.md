@@ -1,3 +1,8 @@
+## v1.0.15
+
+### Fix
+- fix: 修正接口带参数时随机数拼接错误的问题 [434357e](https://github.com/x-dirve/request/commit/434357e045bfc497a762afd25f69539b32a50b2f)
+
 ## v1.0.14
 
 ### Fix
