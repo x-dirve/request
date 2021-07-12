@@ -396,7 +396,7 @@ class Request {
         url = this.resolveUri(url, params);
         // 处理 query 参数
         if (isObject(params)) {
-            url += `?${queryString(params)}`;
+            url += `${url.indexOf("?") !== -1 ? "&" : "?"}${queryString(params)}`;
         }
 
         var xhr = new XMLHttpRequest();
