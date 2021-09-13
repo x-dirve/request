@@ -241,13 +241,20 @@ function resloveUrl(uri, params) {
     return uri;
 }
 var rLogger = console;
+var originConsole = true;
 /**日志 */
 function log() {
-    var ref;
-
     var msg = [], len = arguments.length;
     while ( len-- ) msg[ len ] = arguments[ len ];
-    (ref = rLogger.log).call.apply(ref, [ rLogger, "%c[Request]", "color: cyan;" ].concat( msg ));
+
+    var args;
+    if (originConsole) {
+        args = ["%c[Request]", "color: cyan;" ].concat( msg);
+    }
+    else {
+        args = msg;
+    }
+    rLogger.log.apply(rLogger, args);
 }
 var Request = function Request() {
     /**默认请求配置 */
@@ -569,9 +576,6 @@ function config(config, mode) {
     var notifyMod = config.notifyMod;
     var notifyMsgFormater = config.notifyMsgFormater;
     var logger = config.logger;
-    if (isDev) {
-        log("config", "->", config);
-    }
     if (!isUndefined(successCode)) {
         CODE_SUCCESS = successCode;
     }
@@ -590,7 +594,11 @@ function config(config, mode) {
         notificationMsgFormater = notifyMsgFormater;
     }
     if (logger && isFunction(logger.log)) {
+        originConsole = false;
         rLogger = logger;
+    }
+    if (isDev) {
+        log("config", "->", config);
     }
 }
 var index = new Request();

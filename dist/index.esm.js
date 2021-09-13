@@ -235,9 +235,17 @@ function resloveUrl(uri, params) {
     return uri;
 }
 var rLogger = console;
+var originConsole = true;
 /**日志 */
 function log(...msg) {
-    rLogger.log.call(rLogger, "%c[Request]", "color: cyan;", ...msg);
+    var args;
+    if (originConsole) {
+        args = ["%c[Request]", "color: cyan;", ...msg];
+    }
+    else {
+        args = msg;
+    }
+    rLogger.log.apply(rLogger, args);
 }
 class Request {
     constructor() {
@@ -549,9 +557,6 @@ Request.A = document.createElement("a");
 function config(config, mode = "production") {
     isDev = mode !== "production";
     const { successCode, hosts, apis, notifyMod, notifyMsgFormater, logger } = config;
-    if (isDev) {
-        log("config", "->", config);
-    }
     if (!isUndefined(successCode)) {
         CODE_SUCCESS = successCode;
     }
@@ -570,7 +575,11 @@ function config(config, mode = "production") {
         notificationMsgFormater = notifyMsgFormater;
     }
     if (logger && isFunction(logger.log)) {
+        originConsole = false;
         rLogger = logger;
+    }
+    if (isDev) {
+        log("config", "->", config);
     }
 }
 var index = new Request();
