@@ -1,3 +1,8 @@
+## v1.0.16
+
+### Feat
+- feat: 增加 logger 配置项 [e77059b](https://github.com/x-dirve/request/commit/e77059b4da020b8fc70df82001bac80aec542574)
+
 ## v1.0.15
 
 ### Fix
