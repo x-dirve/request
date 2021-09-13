@@ -240,13 +240,14 @@ function resloveUrl(uri, params) {
     }
     return uri;
 }
+var rLogger = console;
 /**日志 */
 function log() {
     var ref;
 
     var msg = [], len = arguments.length;
     while ( len-- ) msg[ len ] = arguments[ len ];
-    (ref = console.log).call.apply(ref, [ console, "%c[Request]", "color: cyan;" ].concat( msg ));
+    (ref = rLogger.log).call.apply(ref, [ rLogger, "%c[Request]", "color: cyan;" ].concat( msg ));
 }
 var Request = function Request() {
     /**默认请求配置 */
@@ -567,6 +568,7 @@ function config(config, mode) {
     var apis = config.apis;
     var notifyMod = config.notifyMod;
     var notifyMsgFormater = config.notifyMsgFormater;
+    var logger = config.logger;
     if (isDev) {
         log("config", "->", config);
     }
@@ -586,6 +588,9 @@ function config(config, mode) {
     }
     if (isFunction(notifyMsgFormater)) {
         notificationMsgFormater = notifyMsgFormater;
+    }
+    if (logger && isFunction(logger.log)) {
+        rLogger = logger;
     }
 }
 var index = new Request();

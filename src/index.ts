@@ -190,9 +190,11 @@ export function resloveUrl(uri: string, params?: ReqParams) {
     return uri;
 }
 
+var rLogger = console;
+
 /**日志 */
 function log(...msg:any[]) {
-    console.log.call(console, "%c[Request]", "color: cyan;", ...msg);
+    rLogger.log.call(rLogger, "%c[Request]", "color: cyan;", ...msg);
 }
 
 class Request {
@@ -549,10 +551,13 @@ type ConfigOption = {
     apis?:Record<string, string>;
 
     /**提示浮层 */
-    notifyMod?:any;
+    notifyMod?: any;
 
     /**提示信息格式化函数 */
     notifyMsgFormater?: (msg: ErrorMsg) => any;
+
+    /**日志模块 */
+    logger?: any;
 }
 
 /**
@@ -563,7 +568,7 @@ type ConfigOption = {
 function config(config: ConfigOption, mode: Mode = "production") {
     isDev = mode !== "production";
 
-    const { successCode, hosts, apis, notifyMod, notifyMsgFormater } = config;
+    const { successCode, hosts, apis, notifyMod, notifyMsgFormater, logger } = config;
 
     if (isDev) {
         log("config", "->", config);
@@ -589,6 +594,10 @@ function config(config: ConfigOption, mode: Mode = "production") {
 
     if (isFunction(notifyMsgFormater)) {
         notificationMsgFormater = notifyMsgFormater;
+    }
+
+    if (logger && isFunction(logger.log)) {
+        rLogger = logger;
     }
 }
 

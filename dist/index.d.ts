@@ -171,6 +171,8 @@ declare type ConfigOption = {
     notifyMod?: any;
     /**提示信息格式化函数 */
     notifyMsgFormater?: (msg: ErrorMsg) => any;
+    /**日志模块 */
+    logger?: any;
 };
 /**
  * 设置请求模块
