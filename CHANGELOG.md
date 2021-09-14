@@ -1,3 +1,8 @@
+## v1.0.17
+
+### Fix
+- fix: 修复使用外部 logger 时的显示问题 [62fc6b2](https://github.com/x-dirve/request/commit/62fc6b27e5a65786bf8e7eac7d333b98525729b4)
+
 ## v1.0.16
 
 ### Feat
