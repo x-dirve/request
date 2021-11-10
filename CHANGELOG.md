@@ -1,3 +1,11 @@
+## v1.0.18
+
+### Feat
+- feat: 请求 reject 函数传入请求错误实例，可使用实例 code 或 cause 字段的错误码处理错误 [1587a1d](https://github.com/x-dirve/request/commit/1587a1d0a5e84c89fd4349c510bbb7dc4371e9df)
+
+### Fix
+- fix: 修复使用外部 looger 时的显示问题 [62fc6b2](https://github.com/x-dirve/request/commit/62fc6b27e5a65786bf8e7eac7d333b98525729b4)
+
 ## v1.0.17
 
 ### Fix
