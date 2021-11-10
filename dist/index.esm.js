@@ -167,6 +167,18 @@ function queryString(dat) {
     return queryStr;
 }
 
+class RequestError extends Error {
+    constructor(message, code) {
+        // @ts-ignore
+        super(message, { "cause": code });
+        /**错误码 */
+        this.code = -1;
+        /**错误名称 */
+        this.name = "RequestError";
+        this.code = code;
+    }
+}
+
 /**出错信息提示格式化函数 */
 var notificationMsgFormater = function (msg) {
     return msg;
@@ -497,17 +509,17 @@ class Request {
                     resolve(config.raw ? re : data || {});
                 }
                 else {
-                    reject(new Error(`Request Error, status [${this.status}]`));
+                    reject(new RequestError(`${this.status} Error`, this.status));
                 }
             };
             xhr.onerror = function () {
                 me.hooks.onResponseError({}, "Net", reqConf);
-                reject(new Error(`Request Error,[${type}] >> ${url}`));
+                reject(new RequestError(`Net Error, [${type}] >> ${url}`, this.status));
             };
-            xhr.ontimeout = xhr.onerror = function (e) {
+            xhr.ontimeout = xhr.onerror = function () {
                 spliceQueue(this);
                 me.hooks.onResponseError({}, "Timeout", reqConf);
-                reject(e);
+                reject(new RequestError(`Request timeout, [${type}] >> ${url}`, this.status));
             };
             xhr.send(reqData);
         });

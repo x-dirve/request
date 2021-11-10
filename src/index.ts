@@ -11,6 +11,8 @@ import {
     isNumber
 } from "@x-drive/utils";
 
+import RequestError from "./request-error";
+
 /**接口错误时的提示信息 */
 type ErrorMsg = {
     /**错误详情 */
@@ -486,21 +488,25 @@ class Request {
                         config.raw ? re : data || {}
                     );
                 } else {
-                    reject(new Error(`Request Error, status [${this.status}]`));
+                    reject(
+                        new RequestError(`${this.status} Error`, this.status)
+                    );
                 }
             }
 
             xhr.onerror = function() {
                 me.hooks.onResponseError({}, "Net", reqConf);
                 reject(
-                    new Error(`Request Error,[${type}] >> ${url}`)
+                    new RequestError(`Net Error, [${type}] >> ${url}`, this.status)
                 );
             }
 
-            xhr.ontimeout = xhr.onerror = function (e) {
+            xhr.ontimeout = xhr.onerror = function () {
                 spliceQueue(this);
                 me.hooks.onResponseError({}, "Timeout", reqConf);
-                reject(e);
+                reject(
+                    new RequestError(`Request timeout, [${type}] >> ${url}`, this.status)
+                );
             }
 
             xhr.send(reqData);

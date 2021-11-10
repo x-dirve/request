@@ -173,6 +173,24 @@ function queryString(dat) {
     return queryStr;
 }
 
+var RequestError = /*@__PURE__*/(function (Error) {
+    function RequestError(message, code) {
+        // @ts-ignore
+        Error.call(this, message, { "cause": code });
+        /**错误码 */
+        this.code = -1;
+        /**错误名称 */
+        this.name = "RequestError";
+        this.code = code;
+    }
+
+    if ( Error ) RequestError.__proto__ = Error;
+    RequestError.prototype = Object.create( Error && Error.prototype );
+    RequestError.prototype.constructor = RequestError;
+
+    return RequestError;
+}(Error));
+
 /**出错信息提示格式化函数 */
 var notificationMsgFormater = function (msg) {
     return msg;
@@ -510,17 +528,17 @@ Request.prototype.run = function run (type, url, params, data, config) {
                 resolve(config.raw ? re : data || {});
             }
             else {
-                reject(new Error(("Request Error, status [" + (this.status) + "]")));
+                reject(new RequestError(((this.status) + " Error"), this.status));
             }
         };
         xhr.onerror = function () {
             me.hooks.onResponseError({}, "Net", reqConf);
-            reject(new Error(("Request Error,[" + type + "] >> " + url)));
+            reject(new RequestError(("Net Error, [" + type + "] >> " + url), this.status));
         };
-        xhr.ontimeout = xhr.onerror = function (e) {
+        xhr.ontimeout = xhr.onerror = function () {
             spliceQueue(this);
             me.hooks.onResponseError({}, "Timeout", reqConf);
-            reject(e);
+            reject(new RequestError(("Request timeout, [" + type + "] >> " + url), this.status));
         };
         xhr.send(reqData);
     });
