@@ -68,12 +68,15 @@ type ReqSetting = {
 
         [key: string]: string;
     };
+
+    /**请求默认配置 */
+    config?: ReqConf;
 }
 
 var isDev = false;
 
 /**自动提示用的浮层 */
-var notification:any;
+var notification: any;
 
 /**所有 api 存储对象 */
 const APIS: Record<string, string> = {};
@@ -196,8 +199,8 @@ var rLogger = console;
 var originConsole = true;
 
 /**日志 */
-function log(...msg:any[]) {
-    var args:string[];
+function log(...msg: any[]) {
+    var args: string[];
     if (originConsole) {
         args = ["%c[Request]", "color: cyan;", ...msg];
     } else {
@@ -224,7 +227,7 @@ class Request {
     hooks: ReqHooks = {};
 
     /**字段映射对象 */
-    keys:{[key:string]: string} = {
+    keys: { [key: string]: string } = {
         "data": "data"
         , "code": "code"
         , "message": "message"
@@ -237,7 +240,7 @@ class Request {
             return raw;
         }
         // @ts-ignore
-        const onResponseError = (re:any) => {
+        const onResponseError = (re: any) => {
             return true;
         }
         // 默认 hook
@@ -286,7 +289,7 @@ class Request {
      * 放弃当前正在发起的所有请求
      * @param keyname 指定清除的页面请求
      */
-    static cancel(keyname?:string) {
+    static cancel(keyname?: string) {
         const pathname = isString(keyname) ? keyname : window.location.pathname;
         var nowReqs = RequestQueue[pathname];
         if (nowReqs && nowReqs.length) {
@@ -360,12 +363,12 @@ class Request {
      * 配置实例中的某些设置
      * @param setting 实例配置对象
      */
-    setting(setting?:ReqSetting) {
+    setting(setting?: ReqSetting) {
         if (!isObject(setting)) {
             return;
         }
         if (isDev) {
-            log("setting","->", setting);
+            log("setting", "->", setting);
         }
         if (isObject(setting.hooks)) {
             this.hooks = merge(this.hooks, setting.hooks);
@@ -373,6 +376,10 @@ class Request {
 
         if (isObject(setting.keys)) {
             this.keys = merge(this.keys, setting.keys);
+        }
+
+        if (isObject(setting.config)) {
+            this.defConf = merge(this.defConf, setting.config);
         }
     }
 
@@ -443,7 +450,7 @@ class Request {
 
             xhr.open(type, url, true);
 
-            each(header, (val:string, key:string) => {
+            each(header, (val: string, key: string) => {
                 xhr.setRequestHeader(key, val);
             });
 
@@ -494,7 +501,7 @@ class Request {
                 }
             }
 
-            xhr.onerror = function() {
+            xhr.onerror = function () {
                 me.hooks.onResponseError({}, "Net", reqConf);
                 reject(
                     new RequestError(`Net Error, [${type}] >> ${url}`, this.status)
@@ -555,13 +562,13 @@ export { Request as R };
 
 type ConfigOption = {
     /**请求成功时的状态码 */
-    successCode?: number|string;
+    successCode?: number | string;
 
     /**域名配置 */
     hosts?: Record<string, string>;
 
     /**api 别名 */
-    apis?:Record<string, string>;
+    apis?: Record<string, string>;
 
     /**提示浮层 */
     notifyMod?: any;
