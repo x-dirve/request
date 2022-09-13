@@ -1,3 +1,8 @@
+## v1.0.19
+
+### Feat
+- feat: 支持配置请求实例的默认请求 [33973c7](https://github.com/x-dirve/request/commit/33973c72bdaa087dc17a64e52af73c4531f9b994)
+
 ## v1.0.18
 
 ### Feat
