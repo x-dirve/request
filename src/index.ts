@@ -438,7 +438,7 @@ class Request {
             }
 
             if (isCrossOrigin) {
-                if (config.credentials) {
+                if (reqConf.credentials) {
                     xhr.withCredentials = true;
                 }
                 delete header["X-Requested-With"];
