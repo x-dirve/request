@@ -1,3 +1,8 @@
+## v1.0.20
+
+### Fix
+- fix: 修复默认设置不生效的问题 [33bafb0](https://github.com/x-dirve/request/commit/33bafb036b66327952b93cb3e6d601f05c476578)
+
 ## v1.0.19
 
 ### Feat
