@@ -1,3 +1,8 @@
+## v1.0.23
+
+### Feat
+- feat: onRequest 钩子增加 url 参数, 当 onRequest 返回 false 时终止请求操作。注意 url 参数此时为原始 url , 尚未被模块解析 [f7c228e](https://github.com/x-dirve/request/commit/f7c228e88107bc67565688314ce5c9105d7f78ad)
+
 ## v1.0.22
 
 ### Fix
