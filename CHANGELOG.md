@@ -1,3 +1,8 @@
+## v1.0.22
+
+### Fix
+- fix: 修复 onResponse 不能正确修改返回数据的问题, 修复当返回数据不是 Object 时读取相关字段导致的异常 [d6153b5](https://github.com/x-dirve/request/commit/d6153b58ce5bfba22d9a0da46b9e0ad0d17d8105)
+
 ## v1.0.21
 
 ### Feat
