@@ -458,23 +458,26 @@ class Request {
             xhr.onload = function () {
                 spliceQueue(this);
                 if (this.status >= 200 && this.status < 300 || this.status === 304) {
-                    var re: any = this.responseText;
+                    var re: unknown = this.responseText;
                     // 返回钩子
                     if (isFunction(me.hooks.onResponse)) {
-                        me.hooks.onResponse.call(me, re, config, params, reqData, this);
+                        const hookRe = me.hooks.onResponse.call(me, re, config, params, reqData, this);
+                        if (!isUndefined(hookRe)) {
+                            re = hookRe;
+                        }
                     }
 
-                    if (reqConf.dataType === "json") {
+                    if (reqConf.dataType === "json" && isString(re)) {
                         try {
-                            re = JSON.parse(re);
+                            re = JSON.parse(re as string);
                         } catch (err) {
                             reject(err);
                             return;
                         }
                     }
 
-                    const data = re[me.keys.data];
-                    const code = re[me.keys.code];
+                    const data = isObject(re) ? re[me.keys.data] : re;
+                    const code = isObject(re) ? re[me.keys.code] : null;
 
                     if (Number(code) !== CODE_SUCCESS) {
                         const message: string = re[me.keys.message];
