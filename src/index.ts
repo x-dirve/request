@@ -43,11 +43,11 @@ type ReqErrorTypes = "Business" | "Net" | "Timeout";
 /**请求钩子 */
 type ReqHooks = {
     /**请求前钩子 */
-    onRequest?: (config?: ReqConf, params?: ReqParams, data?: ReqData) => void;
+    onRequest?: (config?: ReqConf, params?: ReqParams, data?: ReqData, url?: string) => void | boolean;
     /**请求后钩子 */
     onResponse?: (raw?: string, config?: ReqConf, params?: ReqParams, data?: ReqData, req?: XMLHttpRequest) => any;
     /**请求失败钩子 */
-    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf, req?: XMLHttpRequest) => boolean;
+    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf, req?: XMLHttpRequest) => void | boolean;
 }
 
 /**请求实例设置 */
@@ -234,15 +234,11 @@ class Request {
     };
 
     constructor() {
-        // @ts-ignore
-        const onRequest = (config: ReqConf, params: ReqParams, data: ReqData) => { };
+        const onRequest = () => { };
         const onResponse = (raw: string) => {
             return raw;
         }
-        // @ts-ignore
-        const onResponseError = (re: any) => {
-            return true;
-        }
+        const onResponseError = () => { }
         // 默认 hook
         this.hooks = {
             onRequest
@@ -407,7 +403,10 @@ class Request {
 
         // 请求钩子
         if (isFunction(this.hooks.onRequest)) {
-            this.hooks.onRequest.call(this, reqConf, params, data);
+            const reqHookRe = this.hooks.onRequest.call(this, reqConf, params, data, url);
+            if (reqHookRe === false) {
+                return;
+            }
         }
 
         // 解析地址

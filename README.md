@@ -111,7 +111,7 @@
 - `onRequest` 请求前钩子
     ```ts
     /**请求前钩子 */
-    onRequest?: (config?: ReqConf, params?: ReqParams, data?: ReqData) => void;
+    onRequest?: (config?: ReqConf, params?: ReqParams, data?: ReqData, url?:string) => void | boolean;
     ```
 - `onResponse` 请求后钩子
     ```ts
@@ -121,5 +121,5 @@
 - `onResponseError` 请求失败钩子
     ```ts
     /**请求失败钩子 */
-    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf, req?: XMLHttpRequest) => boolean;
+    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf, req?: XMLHttpRequest) => void | boolean;
     ```
