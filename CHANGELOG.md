@@ -1,3 +1,8 @@
+## v1.0.21
+
+### Feat
+- feat: onResponse、onResponseError 增加 xhr 对象参数，可以用于非业务问题时判断 http status 等操作 [8c56fd5](https://github.com/x-dirve/request/commit/8c56fd5017a78ea5c3ce577677270eea25a568e6)
+
 ## v1.0.20
 
 ### Fix
