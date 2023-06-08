@@ -116,10 +116,10 @@
 - `onResponse` 请求后钩子
     ```ts
     /**请求后钩子 */
-    onResponse?: (raw?: string, config?: ReqConf, params?: ReqParams, data?: ReqData) => any;
+    onResponse?: (raw?: string, config?: ReqConf, params?: ReqParams, data?: ReqData, req?: XMLHttpRequest) => any;
     ```
 - `onResponseError` 请求失败钩子
     ```ts
     /**请求失败钩子 */
-    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf) => boolean;
+    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf, req?: XMLHttpRequest) => boolean;
     ```

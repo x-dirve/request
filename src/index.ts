@@ -45,9 +45,9 @@ type ReqHooks = {
     /**请求前钩子 */
     onRequest?: (config?: ReqConf, params?: ReqParams, data?: ReqData) => void;
     /**请求后钩子 */
-    onResponse?: (raw?: string, config?: ReqConf, params?: ReqParams, data?: ReqData) => any;
+    onResponse?: (raw?: string, config?: ReqConf, params?: ReqParams, data?: ReqData, req?: XMLHttpRequest) => any;
     /**请求失败钩子 */
-    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf) => boolean;
+    onResponseError?: (re?: any, type?: ReqErrorTypes, config?: ReqConf, req?: XMLHttpRequest) => boolean;
 }
 
 /**请求实例设置 */
@@ -461,7 +461,7 @@ class Request {
                     var re: any = this.responseText;
                     // 返回钩子
                     if (isFunction(me.hooks.onResponse)) {
-                        me.hooks.onResponse.call(me, re, config, params, reqData);
+                        me.hooks.onResponse.call(me, re, config, params, reqData, this);
                     }
 
                     if (reqConf.dataType === "json") {
@@ -487,7 +487,7 @@ class Request {
                                 })
                             );
                         }
-                        me.hooks.onResponseError(re, "Business", reqConf);
+                        me.hooks.onResponseError(re, "Business", reqConf, this);
                         return reject(re);
                     }
 
@@ -495,6 +495,7 @@ class Request {
                         config.raw ? re : data || {}
                     );
                 } else {
+                    me.hooks.onResponseError({}, "Net", reqConf, this);
                     reject(
                         new RequestError(`${this.status} Error`, this.status)
                     );
@@ -502,7 +503,7 @@ class Request {
             }
 
             xhr.onerror = function () {
-                me.hooks.onResponseError({}, "Net", reqConf);
+                me.hooks.onResponseError({}, "Net", reqConf, this);
                 reject(
                     new RequestError(`Net Error, [${type}] >> ${url}`, this.status)
                 );
@@ -510,7 +511,7 @@ class Request {
 
             xhr.ontimeout = xhr.onerror = function () {
                 spliceQueue(this);
-                me.hooks.onResponseError({}, "Timeout", reqConf);
+                me.hooks.onResponseError({}, "Timeout", reqConf, this);
                 reject(
                     new RequestError(`Request timeout, [${type}] >> ${url}`, this.status)
                 );
