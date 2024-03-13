@@ -28,6 +28,8 @@ type ErrorMsg = {
 /**环境 */
 type Mode = "development" | "production" | "test";
 
+type ReqTypes = "GET" | "PUT" | "DELETE" | "POST";
+
 /**出错信息提示格式化函数 */
 var notificationMsgFormater = function (msg: ErrorMsg) {
     return msg;
@@ -388,9 +390,7 @@ class Request {
      * @param    config  请求配置
      * @returns          请求 Promise 对象
      */
-    run<T = AnySubject>(type: string, url: string, params: ReqParams = {}, data: ReqData = {}, config: ReqConf = {}): Promise<T> {
-        type = type.toLocaleLowerCase();
-
+    run<T = AnySubject>(type: ReqTypes, url: string, params: ReqParams = {}, data: ReqData = {}, config: ReqConf = {}): Promise<T> {
         var reqConf: ReqConf = merge(
             this.defConf
             , config
@@ -422,7 +422,7 @@ class Request {
             var header: object = reqConf.header;
             const isCrossOrigin = !this.checkOriginHost(url);
 
-            if (!REQ_METHOD_REQ_EXP.test(type)) {
+            if (!REQ_METHOD_REQ_EXP.test(type.toLocaleLowerCase())) {
                 if (!header.hasOwnProperty("Content-Type")) {
                     header["Content-Type"] = "application/json";
                 }
@@ -558,6 +558,44 @@ class Request {
             data = {};
         }
         return this.run<T>("POST", url, param, data, config);
+    }
+
+    /**
+     * 发起一个 put 请求
+     * @param    url      请求url或别名
+     * @param    param    请求参数
+     * @param    data     请求数据
+     * @param    config   请求配置
+     * @returns
+     */
+    put<T = AnySubject>(url: string, param?: ReqParams, data?: ReqData, config?: ReqConf) {
+        if (isObject(param) && isUndefined(data)) {
+            data = param;
+            param = {};
+        }
+        if (isUndefined(data)) {
+            data = {};
+        }
+        return this.run<T>("PUT", url, param, data, config);
+    }
+
+    /**
+     * 发起一个 delete 请求
+     * @param    url      请求url或别名
+     * @param    param    请求参数
+     * @param    data     请求数据
+     * @param    config   请求配置
+     * @returns
+     */
+    del<T = AnySubject>(url: string, param?: ReqParams, data?: ReqData, config?: ReqConf) {
+        if (isObject(param) && isUndefined(data)) {
+            data = param;
+            param = {};
+        }
+        if (isUndefined(data)) {
+            data = {};
+        }
+        return this.run<T>("DELETE", url, param, data, config);
     }
 }
 
