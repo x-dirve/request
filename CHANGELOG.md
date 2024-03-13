@@ -1,3 +1,8 @@
+## v1.0.24
+
+### Feat
+- feat: 新增 del 、put 方法 [6f5e998](https://github.com/x-dirve/request/commit/6f5e99853d8fd09308f32f4b189c964d341648fc)
+
 ## v1.0.23
 
 ### Feat
