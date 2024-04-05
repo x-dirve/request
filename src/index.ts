@@ -8,7 +8,8 @@ import {
     labelReplace,
     labelReplaceExp,
     isFunction,
-    isNumber
+    isNumber,
+    copy
 } from "@x-drive/utils";
 
 import RequestError from "./request-error";
@@ -392,7 +393,7 @@ class Request {
      */
     run<T = AnySubject>(type: ReqTypes, url: string, params: ReqParams = {}, data: ReqData = {}, config: ReqConf = {}): Promise<T> {
         var reqConf: ReqConf = merge(
-            this.defConf
+            copy(this.defConf)
             , config
         )
 
