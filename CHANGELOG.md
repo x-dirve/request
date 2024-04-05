@@ -1,3 +1,8 @@
+## v1.0.25
+
+### Fix
+- fix: 修复请求配置项被污染的问题 [252a64f](https://github.com/x-dirve/request/commit/252a64f5ffa2bc36aa9e1980984e392a006e8f43)
+
 ## v1.0.24
 
 ### Feat
